@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Enfoque Cognitivo · Panorama del curso — Juan Carlos Valderrama Cárdenas</title>
+<style>
+  :root{
+    --azul-oscuro:#0B2545;
+    --azul-medio:#13315C;
+    --azul-acento:#13538A;
+    --dorado:#E7C873;
+    --gris-calido:#F4F1EA;
+    --gris-texto:#1F2A37;
+    --gris-suave:#E9EEF5;
+    --blanco:#FFFFFF;
+    --verde:#1E7A46;
+    --rojo:#B3261E;
+    --sombra:0 10px 30px rgba(11,37,69,.10);
+    --radio:16px;
+    --transicion:all .35s cubic-bezier(.4,.0,.2,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;
+    background:var(--blanco);color:var(--gris-texto);
+    font-size:28px;line-height:1.5;overflow:hidden;
+  }
+  #app{display:flex;height:100vh;width:100vw;position:relative;}
+
+  #sidebar{
+    width:340px;background:var(--azul-oscuro);color:var(--blanco);
+    display:flex;flex-direction:column;padding:26px 20px;
+    transition:var(--transicion);flex-shrink:0;position:relative;z-index:20;overflow-y:auto;
+  }
+  #sidebar::-webkit-scrollbar{width:6px;}
+  #sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px;}
+  #sidebar.oculto{margin-left:-340px;}
+  #sidebar h2{font-size:20px;font-weight:600;letter-spacing:.3px;margin-bottom:6px;color:var(--dorado);line-height:1.25;}
+  #sidebar .autor{font-size:14.5px;opacity:.75;margin-bottom:20px;line-height:1.3;}
+  #sidebar nav ul{list-style:none;display:flex;flex-direction:column;gap:3px;}
+  #sidebar nav a{
+    display:block;color:rgba(255,255,255,.82);text-decoration:none;
+    font-size:14.5px;padding:7px 12px;border-radius:8px;cursor:pointer;
+    transition:var(--transicion);border-left:3px solid transparent;line-height:1.25;
+  }
+  #sidebar nav a:hover{background:rgba(255,255,255,.07);color:var(--blanco);}
+  #sidebar nav a.activo{background:rgba(231,200,115,.15);color:var(--dorado);border-left-color:var(--dorado);}
+  #toggleSidebar{
+    position:fixed;top:18px;left:356px;z-index:30;
+    background:var(--azul-oscuro);color:var(--blanco);border:none;
+    width:42px;height:42px;border-radius:50%;cursor:pointer;
+    font-size:18px;display:flex;align-items:center;justify-content:center;
+    box-shadow:var(--sombra);transition:var(--transicion);
+  }
+  #toggleSidebar:hover{background:var(--azul-acento);}
+  #toggleSidebar.oculto{left:18px;}
+
+  #stage{flex:1;position:relative;overflow:hidden;background:var(--blanco);}
+  .slide{
+    position:absolute;inset:0;padding:55px 75px 110px 75px;
+    opacity:0;visibility:hidden;transform:translateX(30px);
+    transition:opacity .5s ease, transform .5s ease, visibility .5s;
+    overflow-y:auto;display:flex;flex-direction:column;
+  }
+  .slide.activa{opacity:1;visibility:visible;transform:translateX(0);}
+  .slide::-webkit-scrollbar{width:10px;}
+  .slide::-webkit-scrollbar-thumb{background:var(--gris-suave);border-radius:5px;}
+  .slide h1{font-size:68px;color:var(--azul-oscuro);font-weight:700;line-height:1.1;margin-bottom:18px;}
+  .slide h2{font-size:52px;color:var(--azul-oscuro);font-weight:700;line-height:1.15;margin-bottom:24px;}
+  .slide h3{font-size:34px;color:var(--azul-acento);font-weight:600;margin:20px 0 12px;}
+  .slide p, .slide li{font-size:27px;line-height:1.55;margin-bottom:13px;}
+  .slide ul{margin-left:28px;margin-bottom:16px;}
+  .slide li{margin-bottom:11px;}
+
+  .subtitulo{font-size:31px;color:var(--azul-acento);font-weight:400;margin-bottom:30px;}
+  .etiqueta{
+    display:inline-block;background:var(--gris-calido);color:var(--azul-oscuro);
+    font-size:17px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+    padding:8px 18px;border-radius:22px;margin-bottom:18px;
+  }
+  .etiqueta.dorada{background:var(--dorado);}
+  .etiqueta.anim{background:var(--azul-acento);color:var(--blanco);}
+  .etiqueta.unidad1{background:#E3F0FA;color:#0B2545;}
+  .etiqueta.unidad2{background:#FFF0DC;color:#8A4A00;}
+
+  .tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin:20px 0;}
+  .tarjeta{background:var(--gris-calido);border-radius:var(--radio);padding:24px;border-left:6px solid var(--azul-acento);transition:var(--transicion);}
+  .tarjeta:hover{transform:translateY(-3px);box-shadow:var(--sombra);}
+  .tarjeta h4{font-size:24px;color:var(--azul-oscuro);margin-bottom:10px;}
+  .tarjeta p{font-size:21px;margin-bottom:0;line-height:1.5;}
+  .destacado{background:var(--azul-oscuro);color:var(--blanco);border-radius:var(--radio);padding:26px 30px;margin:22px 0;font-size:27px;line-height:1.5;border-left:7px solid var(--dorado);}
+  .destacado strong{color:var(--dorado);}
+  .cita{background:var(--gris-calido);border-left:6px solid var(--dorado);padding:22px 28px;border-radius:var(--radio);font-size:25px;font-style:italic;color:var(--azul-medio);margin:20px 0;line-height:1.5;}
+  .ejemplo-cotidiano{background:linear-gradient(135deg,#FFF8E7 0%,#FDF4DC 100%);border:2px dashed var(--dorado);border-radius:var(--radio);padding:18px 24px;margin:14px 0;font-size:24px;color:var(--azul-medio);line-height:1.45;}
+  .ejemplo-cotidiano::before{content:"💡 Ejemplo cotidiano: ";font-weight:700;color:var(--azul-oscuro);}
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:22px;}
+  th,td{padding:14px 16px;text-align:left;border-bottom:2px solid var(--gris-suave);}
+  th{background:var(--azul-oscuro);color:var(--blanco);font-weight:700;font-size:22px;}
+  tr:nth-child(even) td{background:#FAFBFD;}
+
+  #slide-1{justify-content:center;align-items:flex-start;background:linear-gradient(135deg,var(--blanco) 55%,var(--gris-calido) 100%);}
+  #slide-1 h1{font-size:74px;max-width:1150px;margin-bottom:22px;line-height:1.05;}
+  #slide-1 .subtitulo{font-size:32px;color:var(--azul-medio);margin-bottom:44px;max-width:1000px;}
+  .info-docente{background:var(--azul-oscuro);color:var(--blanco);padding:26px 38px;border-radius:var(--radio);display:inline-block;border-left:8px solid var(--dorado);}
+  .info-docente .nombre{font-size:29px;font-weight:700;color:var(--dorado);margin-bottom:6px;}
+  .info-docente .detalle{font-size:19px;opacity:.85;}
+  .pregunta-portada{margin-top:42px;font-size:29px;font-style:italic;color:var(--azul-acento);max-width:1050px;line-height:1.4;}
+
+  .actividad{background:var(--gris-suave);border-radius:var(--radio);padding:28px 32px;margin:22px 0;}
+  .btn{background:var(--azul-acento);color:var(--blanco);border:none;padding:16px 28px;font-size:22px;border-radius:12px;cursor:pointer;transition:var(--transicion);font-weight:600;}
+  .btn:hover{background:var(--azul-oscuro);transform:translateY(-2px);}
+  .btn-sec{background:transparent;color:var(--azul-acento);border:3px solid var(--azul-acento);}
+  .btn-sec:hover{background:var(--azul-acento);color:var(--blanco);}
+
+  .clasif-item{
+    background:var(--blanco);border-radius:12px;padding:20px 24px;margin:14px 0;
+    font-size:24px;transition:var(--transicion);
+    border-left:6px solid var(--azul-acento);color:var(--gris-texto);line-height:1.4;
+  }
+  .clasif-item .opciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+  .clasif-item .opciones button{
+    padding:12px 18px;font-size:18px;border-radius:10px;border:3px solid var(--azul-acento);
+    background:transparent;color:var(--azul-acento);cursor:pointer;transition:var(--transicion);font-weight:700;
+  }
+  .clasif-item .opciones button:hover{background:var(--azul-acento);color:var(--blanco);}
+  .clasif-item .opciones button:disabled{cursor:default;opacity:.7;}
+  .clasif-item .opciones button.ok{background:var(--verde);border-color:var(--verde);color:var(--blanco);opacity:1;}
+  .clasif-item .opciones button.no{background:var(--rojo);border-color:var(--rojo);color:var(--blanco);opacity:1;}
+  .clasif-item .explicacion{
+    font-size:20px;color:var(--azul-medio);
+    background:var(--gris-calido);padding:14px 18px;border-radius:10px;
+    margin-top:12px;display:none;line-height:1.5;
+  }
+  .clasif-item.resuelto .explicacion{display:block;}
+
+  /* ANIMACIONES */
+  .anim-wrap{
+    background:var(--blanco);border-radius:var(--radio);padding:22px;
+    box-shadow:var(--sombra);margin:20px 0;display:flex;flex-direction:column;align-items:center;
+  }
+  .anim-controles{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:18px;}
+  .anim-controles button{
+    padding:14px 24px;font-size:20px;font-weight:700;border:none;
+    border-radius:12px;cursor:pointer;transition:var(--transicion);
+    color:var(--blanco);background:var(--azul-acento);
+  }
+  .anim-controles button:hover{transform:translateY(-2px);box-shadow:var(--sombra);background:var(--azul-oscuro);}
+  .anim-controles button.dorado{background:var(--dorado);color:var(--azul-oscuro);}
+  .anim-controles button.dorado:hover{background:var(--azul-oscuro);color:var(--dorado);}
+  .anim-controles button.verde{background:var(--verde);}
+  .anim-controles button.verde:hover{background:#155e34;}
+  .anim-canvas{
+    background:#FBFCFE;border-radius:12px;border:2px solid var(--gris-suave);
+    max-width:100%;
+  }
+  .anim-narracion{
+    margin-top:16px;font-size:22px;font-weight:600;text-align:center;
+    color:var(--azul-oscuro);background:var(--gris-calido);
+    padding:16px 22px;border-radius:12px;min-height:80px;
+    display:flex;align-items:center;justify-content:center;
+    line-height:1.45;max-width:960px;
+  }
+
+  /* Línea de tiempo filosófica */
+  .filosofia-linea{
+    display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:20px 0;
+    position:relative;
+  }
+  .filo-item{
+    text-align:center;padding:14px 8px;background:var(--blanco);
+    border-radius:12px;border:3px solid var(--gris-suave);
+    transition:var(--transicion);position:relative;
+  }
+  .filo-item.activo{
+    border-color:var(--dorado);background:#FFF8E7;transform:scale(1.06);
+    box-shadow:var(--sombra);
+  }
+  .filo-item .anio{
+    font-size:14px;font-weight:800;color:var(--dorado);
+    background:var(--azul-oscuro);border-radius:8px;display:inline-block;
+    padding:3px 10px;margin-bottom:8px;
+  }
+  .filo-item .nombre{font-size:17px;font-weight:800;color:var(--azul-oscuro);line-height:1.2;}
+  .filo-item .idea{font-size:13px;color:var(--azul-medio);margin-top:6px;line-height:1.3;}
+
+  /* SIMULACIÓN */
+  .simulacion{display:grid;grid-template-columns:1fr 1.15fr;gap:28px;align-items:start;margin-top:18px;}
+  .controles{display:flex;flex-direction:column;gap:16px;}
+  .control{background:var(--gris-calido);padding:16px 20px;border-radius:12px;}
+  .control label{display:flex;justify-content:space-between;font-size:20px;font-weight:700;color:var(--azul-oscuro);margin-bottom:8px;}
+  .control label span{color:var(--azul-acento);font-weight:700;font-size:22px;}
+  .control input[type=range]{width:100%;accent-color:var(--azul-acento);cursor:pointer;height:28px;}
+  #sim-canvas-wrap{background:var(--blanco);border-radius:var(--radio);padding:22px;box-shadow:var(--sombra);display:flex;flex-direction:column;align-items:center;}
+  #sim-canvas{max-width:100%;}
+  #sim-mensaje{
+    margin-top:16px;font-size:22px;font-weight:600;text-align:center;
+    padding:16px 20px;border-radius:12px;background:var(--gris-suave);
+    color:var(--azul-oscuro);transition:var(--transicion);min-height:100px;
+    display:flex;align-items:center;justify-content:center;line-height:1.4;
+  }
+
+  #barra-progreso{position:fixed;top:0;left:0;height:5px;background:linear-gradient(90deg,var(--azul-acento),var(--dorado));transition:width .4s ease;z-index:40;}
+  #controles-nav{position:fixed;bottom:22px;right:26px;display:flex;gap:12px;align-items:center;z-index:30;}
+  #controles-nav button{
+    width:54px;height:54px;border-radius:50%;border:3px solid var(--azul-oscuro);
+    background:var(--blanco);color:var(--azul-oscuro);font-size:24px;cursor:pointer;
+    transition:var(--transicion);display:flex;align-items:center;justify-content:center;
+  }
+  #controles-nav button:hover:not(:disabled){background:var(--azul-oscuro);color:var(--blanco);}
+  #controles-nav button:disabled{opacity:.35;cursor:not-allowed;}
+  #contador{position:fixed;bottom:32px;left:26px;font-size:17px;color:var(--azul-oscuro);opacity:.65;z-index:30;font-weight:700;letter-spacing:1.2px;}
+
+  @media (max-width:1300px){
+    body{font-size:24px;}
+    .slide{padding:46px 46px 100px 46px;}
+    .slide h1{font-size:54px;}
+    .slide h2{font-size:42px;}
+    .slide h3{font-size:29px;}
+    .slide p,.slide li{font-size:23px;}
+    .tarjeta h4{font-size:22px;}
+    .tarjeta p{font-size:19px;}
+    .destacado{font-size:23px;}
+    .cita{font-size:21px;}
+    .ejemplo-cotidiano{font-size:21px;}
+    table{font-size:19px;}
+    th{font-size:19px;}
+    .clasif-item{font-size:21px;}
+    .clasif-item .opciones button{font-size:16px;padding:10px 14px;}
+    #sidebar{width:300px;}
+    #sidebar.oculto{margin-left:-300px;}
+    #toggleSidebar{left:316px;}
+    .filo-item .nombre{font-size:15px;}
+    .filo-item .idea{font-size:12px;}
+  }
+  @media (max-width:900px){
+    .slide{padding:32px 24px 100px 24px;}
+    .slide h1{font-size:40px;}
+    .slide h2{font-size:32px;}
+    body{font-size:19px;}
+    .slide p,.slide li{font-size:19px;}
+    .tarjetas{grid-template-columns:1fr;}
+    #sidebar{position:fixed;left:0;top:0;height:100%;}
+    #toggleSidebar{left:18px;}
+    .filosofia-linea{grid-template-columns:repeat(2,1fr);}
+    .simulacion{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div id="barra-progreso"></div>
+
+<div id="app">
+  <aside id="sidebar">
+    <h2>Enfoque Cognitivo · Panorama</h2>
+    <div class="autor">Curso cuatrimestral · 2 créditos<br>Juan Carlos Valderrama Cárdenas</div>
+    <nav>
+      <ul>
+        <li><a data-ir="1">1. Portada</a></li>
+        <li><a data-ir="2">2. Agenda</a></li>
+        <li><a data-ir="3">3. Pregunta orientadora</a></li>
+        <li><a data-ir="4">4. Estructura del curso</a></li>
+        <li><a data-ir="5">5. Unidad 1: mapa general</a></li>
+        <li><a data-ir="6">6. Antecedentes filosóficos I</a></li>
+        <li><a data-ir="7">7. Locke, Kant y el conocimiento</a></li>
+        <li><a data-ir="8">8. Animación: línea de tiempo filosófica</a></li>
+        <li><a data-ir="9">9. Wundt y la psicología científica</a></li>
+        <li><a data-ir="10">10. William James y el funcionalismo</a></li>
+        <li><a data-ir="11">11. Conductismo: Watson y Skinner</a></li>
+        <li><a data-ir="12">12. Animación: del conductismo al cognitivismo</a></li>
+        <li><a data-ir="13">13. Hitos de la revolución cognitiva</a></li>
+        <li><a data-ir="14">14. La mente como procesador</a></li>
+        <li><a data-ir="15">15. Animación: modelo multialmacén</a></li>
+        <li><a data-ir="16">16. Memoria de trabajo</a></li>
+        <li><a data-ir="17">17. Simulación: memoria de trabajo</a></li>
+        <li><a data-ir="18">18. Codificación, almacenamiento, recuperación</a></li>
+        <li><a data-ir="19">19. Conexionismo</a></li>
+        <li><a data-ir="20">20. Actividad: ¿modelo?</a></li>
+        <li><a data-ir="21">21. Unidad 2: mapa general</a></li>
+        <li><a data-ir="22">22. Beck y Ellis: terapias cognitivas</a></li>
+        <li><a data-ir="23">23. Neurociencia y educación</a></li>
+        <li><a data-ir="24">24. Cierre y referencias</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <button id="toggleSidebar" title="Mostrar/ocultar índice">☰</button>
+
+  <main id="stage">
+
+    <!-- 1. PORTADA -->
+    <section class="slide" id="slide-1">
+      <span class="etiqueta dorada">Enfoque Cognitivo · Curso cuatrimestral</span>
+      <h1>Panorama del curso</h1>
+      <p class="subtitulo">De las preguntas filosóficas sobre el conocimiento a los modelos cognitivos contemporáneos y sus aplicaciones</p>
+      <div class="info-docente">
+        <div class="nombre">Juan Carlos Valderrama Cárdenas</div>
+        <div class="detalle">Docente · Enfoque Cognitivo</div>
+      </div>
+      <p class="pregunta-portada">“¿Cómo surgió el enfoque cognitivo, por qué desplazó al conductismo y cómo explica hoy la conducta desde los fundamentos biológicos, cognoscitivos y sociales?”</p>
+    </section>
+
+    <!-- 2. AGENDA -->
+    <section class="slide" id="slide-2">
+      <span class="etiqueta">Recorrido</span>
+      <h2>Agenda: los dos grandes recorridos</h2>
+      <div class="tarjetas">
+        <div class="tarjeta" style="border-left-color:#13538A;"><h4>Unidad 1. Orígenes de los modelos cognitivos</h4><p>Filosofía del conocimiento · psicología científica · conductismo · revolución cognitiva · procesamiento de información · conexionismo.</p></div>
+        <div class="tarjeta" style="border-left-color:#E7C873;"><h4>Unidad 2. Modelo práctico y aplicaciones</h4><p>Terapias cognitivas (Beck, Ellis) · aplicabilidad en clínica y educación · relación con las neurociencias.</p></div>
+      </div>
+      <div class="destacado">El recorrido va <strong>de la pregunta filosófica “¿cómo conocemos?” a la aplicación clínica y educativa</strong>, pasando por los grandes modelos que estructuran la psicología cognitiva contemporánea.</div>
+    </section>
+
+    <!-- 3. PREGUNTA ORIENTADORA -->
+    <section class="slide" id="slide-3">
+      <span class="etiqueta">Encuadre</span>
+      <h2>Pregunta orientadora del curso</h2>
+      <div class="destacado">
+        ¿Por qué surge la psicología cognitiva? ¿Qué problemas del conductismo favorecieron su aparición? ¿Cómo explicamos hoy la conducta desde sus fundamentos biológicos, cognoscitivos y sociales?
+      </div>
+      <p>La respuesta exige recorrer tres grandes capas:</p>
+      <div class="tarjetas">
+        <div class="tarjeta"><h4>1. Historia de las ideas</h4><p>Filosofía, psicología experimental, conductismo.</p></div>
+        <div class="tarjeta"><h4>2. Modelos explicativos</h4><p>Procesamiento de información y conexionismo.</p></div>
+        <div class="tarjeta"><h4>3. Aplicaciones</h4><p>Clínica, educación y neurociencia cognitiva.</p></div>
+      </div>
+    </section>
+
+    <!-- 4. ESTRUCTURA DEL CURSO -->
+    <section class="slide" id="slide-4">
+      <span class="etiqueta">Estructura</span>
+      <h2>Estructura general del curso</h2>
+      <table>
+        <thead><tr><th>Unidad</th><th>Título</th><th>Foco</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1</strong></td><td>Orígenes de los modelos cognitivos</td><td>Introducción histórica y teórica a la psicología cognitiva</td></tr>
+          <tr><td><strong>2</strong></td><td>Modelo práctico y desarrollo cognitivo</td><td>Aplicaciones: terapias cognitivas, educación, neurociencias</td></tr>
+        </tbody>
+      </table>
+      <div class="destacado">Cada unidad incluye: <strong>presentación · ebook · recurso interactivo · actividad entregable · actividad experiencial</strong>.</div>
+      <p style="margin-top:14px;">El propósito global es comprender <strong>cómo surgieron los modelos cognitivos, por qué se produjo el desplazamiento desde el conductismo y cómo permiten explicar fenómenos psicológicos</strong>.</p>
+    </section>
+
+    <!-- 5. UNIDAD 1 MAPA -->
+    <section class="slide" id="slide-5">
+      <span class="etiqueta unidad1">Unidad 1</span>
+      <h2>Orígenes de los modelos cognitivos</h2>
+      <div class="tarjetas">
+        <div class="tarjeta"><h4>1. Antecedentes filosóficos</h4><p>Platón · Aristóteles · Descartes · Locke · Kant</p></div>
+        <div class="tarjeta"><h4>2. Psicología científica</h4><p>Wundt (1879) · James · funcionalismo</p></div>
+        <div class="tarjeta"><h4>3. Conductismo</h4><p>Watson · Skinner: la conducta observable como objeto</p></div>
+        <div class="tarjeta"><h4>4. Revolución cognitiva</h4><p>Miller · Chomsky · Bruner · Neisser</p></div>
+        <div class="tarjeta"><h4>5. Procesamiento de información</h4><p>Atkinson &amp; Shiffrin · Baddeley &amp; Hitch</p></div>
+        <div class="tarjeta"><h4>6. Conexionismo</h4><p>McCulloch &amp; Pitts · Hebb · Rumelhart &amp; McClelland</p></div>
+      </div>
+      <div class="destacado">El enfoque cognitivo <strong>no aparece aislado</strong>: es resultado de una evolución intelectual que integra filosofía, psicología experimental, ciencias de la información y neurociencia.</div>
+    </section>
+
+    <!-- 6. FILOSOFÍA I -->
+    <section class="slide" id="slide-6">
+      <span class="etiqueta">Unidad 1 · Antecedentes</span>
+      <h2>Antecedentes filosóficos (I)</h2>
+      <div class="tarjetas">
+        <div class="tarjeta"><h4>Platón</h4><p>El conocimiento verdadero se relaciona con ideas o formas abstractas. No depende exclusivamente de la experiencia sensorial.</p></div>
+        <div class="tarjeta"><h4>Aristóteles</h4><p>La experiencia y la información de los sentidos tienen un papel central en el conocimiento.</p></div>
+        <div class="tarjeta"><h4>Descartes</h4><p>Dualismo mente-cuerpo. La mente como ámbito de razonamiento y conciencia, distinta de lo corporal.</p></div>
+      </div>
+      <div class="ejemplo-cotidiano">Cuando dudas si algo lo "sabes porque lo viviste" o "porque lo piensas", estás reproduciendo la tensión clásica entre experiencia y razón.</div>
+    </section>
+
+    <!-- 7. FILOSOFÍA II -->
+    <section class="slide" id="slide-7">
+      <span class="etiqueta">Unidad 1 · Antecedentes</span>
+      <h2>Locke, Kant y el problema del conocimiento</h2>
+      <div class="tarjetas">
+        <div class="tarjeta"><h4>John Locke — empirismo</h4><p>La mente como <em>tabula rasa</em>: el conocimiento se construye a partir de la experiencia y de la información sensorial.</p></div>
+        <div class="tarjeta"><h4>Immanuel Kant — síntesis</h4><p>La mente no es un recipiente pasivo: posee estructuras que organizan la experiencia. Esta idea anticipa la concepción activa del procesamiento cognitivo.</p></div>
+      </div>
+      <div class="destacado">Kant plantea una <strong>síntesis entre racionalismo y empirismo</strong>. Sin esa idea, sería difícil entender después por qué la psicología cognitiva trata a la mente como <em>constructor activo</em> de la información.</div>
+      <div class="ejemplo-cotidiano">Ver una misma escena con distintas expectativas cambia lo que "ves": la mente organiza la experiencia.</div>
+    </section>
+
+    <!-- 8. ANIMACIÓN 1: LÍNEA DE TIEMPO FILOSÓFICA -->
+    <section class="slide" id="slide-8">
+      <span class="etiqueta anim">Animación 1</span>
+      <h2>Línea de tiempo filosófica</h2>
+      <p>Pulsa "Reproducir recorrido" para activar cada autor y ver su idea central.</p>
+      <div class="anim-wrap">
+        <div class="anim-controles">
+          <button id="anim1-play" class="dorado">▶ Reproducir recorrido</button>
+          <button id="anim1-reset" class="verde">↻ Reiniciar</button>
+        </div>
+        <div class="filosofia-linea" id="anim1-linea">
+          <div class="filo-item" data-idx="0"><span class="anio">s. IV a.C.</span><div class="nombre">Platón</div><div class="idea">Ideas y formas abstractas</div></div>
+          <div class="filo-item" data-idx="1"><span class="anio">s. IV a.C.</span><div class="nombre">Aristóteles</div><div class="idea">Experiencia sensorial</div></div>
+          <div class="filo-item" data-idx="2"><span class="anio">s. XVII</span><div class="nombre">Descartes</div><div class="idea">Dualismo mente-cuerpo</div></div>
+          <div class="filo-item" data-idx="3"><span class="anio">s. XVII</span><div class="nombre">Locke</div><div class="idea">Empirismo, tabula rasa</div></div>
+          <div class="filo-item" data-idx="4"><span class="anio">s. XVIII</span><div class="nombre">Kant</div><div class="idea">Estructuras que organizan</div></div>
+        </div>
+        <div class="anim-narracion" id="anim1-narr">Pulsa "Reproducir recorrido" para ver la línea.</div>
+      </div>
+    </section>
+
+    <!-- 9. WUNDT -->
+    <section class="slide" id="slide-9">
+      <span class="etiqueta">Unidad 1 · Psicología científica</span>
+      <h2>Wundt y el nacimiento de la psicología científica</h2>
+      <div class="destacado">
+        1879 · Laboratorio de psicología experimental de Leipzig.
+      </div>
+      <p>Se considera un momento fundamental para la <strong>institucionalización de la psicología como ciencia</strong>. Wundt utilizó la <strong>introspección controlada</strong> para estudiar procesos mentales.</p>
+      <div class="cita">Aunque el método fue criticado posteriormente, abrió una pregunta que aún estructura la psicología cognitiva: <strong>¿cómo estudiar científicamente procesos internos como percepción, atención, memoria, pensamiento y lenguaje?</strong></div>
+      <div class="ejemplo-cotidiano">La pregunta de Wundt sigue viva cuando hoy intentamos medir atención o memoria con tareas computarizadas.</div>
+    </section>
+
+    <!-- 10. JAMES -->
+    <section class="slide" id="slide-10">
+      <span class="etiqueta">Unidad 1 · Funcionalismo</span>
+      <h2>William James y el funcionalismo</h2>
+      <p>William James fue asociado con el estudio de <strong>atención, memoria, percepción</strong> y la denominada <em>"corriente de conciencia"</em>.</p>
+      <div class="tarjetas">
+        <div class="tarjeta"><h4>Aporte</h4><p>Estudió la mente en su función adaptativa: para qué sirven atención y memoria en la vida real.</p></div>
+        <div class="tarjeta"><h4>Diferencia con Wundt</h4><p>Mientras Wundt buscaba estructuras, James se preguntaba por funciones y por el flujo de la experiencia.</p></div>
+      </div>
+      <div class="ejemplo-cotidiano">"No puedo dejar de pensar en algo" es un fenómeno de corriente de conciencia: la mente como flujo, no como conjunto de piezas estáticas.</div>
+    </section>
+
+    <!-- 11. CONDUCTISMO -->
+    <section class="slide" id="slide-11">
+      <span class="etiqueta">Unidad 1 · Conductismo</span>
+      <h2>Conductismo: Watson y Skinner</h2>
+      <div class="tarjetas">
+        <div class="tarjeta"><h4>Características</h4><ul style="margin-left:20px;font-size:20px;"><li>Estudio de la conducta observable</li><li>Relaciones estímulo-respuesta</li><li>Exclusión de los procesos mentales internos como objeto científico</li><li>Procedimientos experimentales rigurosos</li></ul></div>
+        <div class="tarjeta"><h4>Dificultades para explicar</h4><ul style="margin-left:20px;font-size:20px;"><li>Lenguaje</li><li>Percepción</li><li>Pensamiento</li><li>Memoria compleja</li></ul></div>
+      </div>
+      <div class="destacado">El curso <strong>no presenta al conductismo como un error histórico</strong>: reconoce sus aportes metodológicos y experimentales, pero señala sus límites explicativos.</div>
+    </section>
+
+    <!-- 12. ANIMACIÓN 2: DEL CONDUCTISMO AL COGNITIVISMO -->
+    <section class="slide" id="slide-12">
+      <span class="etiqueta anim">Animación 2</span>
+      <h2>Del conductismo al cognitivismo</h2>
+      <p>Observa cómo la "caja negra" conductista se abre progresivamente para mostrar los procesos internos.</p>
+      <div class="anim-wrap">
+        <div class="anim-controles">
+          <button id="anim2-conductismo">▶ Vista conductista</button>
+          <button id="anim2-cognitivismo" class="dorado">▶ Vista cognitiva</button>
+          <button id="anim2-reset" class="verde">↻ Reiniciar</button>
+        </div>
+        <canvas id="anim2-canvas" class="anim-canvas" width="880" height="420"></canvas>
+        <div class="anim-narracion" id="anim2-narr">Pulsa un botón para ver cada enfoque.</div>
+      </div>
+      <div class="ejemplo-cotidiano">Explicar por qué un estudiante resuelve un problema exige algo más que observar la respuesta: hay procesos internos que ocurren en el medio.</div>
+    </section>
+
+    <!-- 13. HITOS REVOLUCIÓN COGNITIVA -->
+    <section class="slide" id="slide-13">
+      <span class="etiqueta">Unidad 1 · Revolución cognitiva</span>
+      <h2>Los hitos de la revolución cognitiva</h2>
+      <table>
+        <thead><tr><th>Año</th><th>Autor(es)</th><th>Aporte</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1956</strong></td><td>George Miller</td><td>Capacidad limitada de la memoria a corto plazo (~7 elementos)</td></tr>
+          <tr><td><strong>1957</strong></td><td>Noam Chomsky</td><td>Crítica al intento de explicar el lenguaje solo con asociaciones E-R</td></tr>
+          <tr><td><strong>1960</strong></td><td>Bruner y Miller</td><td>Centro de Estudios Cognitivos de Harvard</td></tr>
+          <tr><td><strong>1967</strong></td><td>Ulric Neisser</td><td><em>Cognitive Psychology</em>: consolidación del campo</td></tr>
+          <tr><td><strong>1974</strong></td><td>Baddeley &amp; Hitch</td><td>Modelo de memoria de trabajo</td></tr>
+        </tbody>
+      </table>
+      <div class="destacado">La <strong>revolución cognitiva</strong> desplazó el foco de la conducta observable al <strong>estudio científico de los procesos mentales</strong>.</div>
+    </section>
+
+    <!-- 14. MENTE PROCESADOR -->
+    <section class="slide" id="slide-14">
+      <span class="etiqueta">Unidad 1 · Metáfora central</span>
+      <h2>La mente como procesador de información</h2>
+      <div class="cita">La mente funciona de manera análoga a un sistema que <strong>recibe → procesa → almacena → recupera → utiliza información</strong>.</div>
+      <p>Esta metáfora permitió conceptualizar procesos antes difíciles de estudiar científicamente. La cognición se entiende como un conjunto de operaciones mediante las cuales el organismo:</p>
+      <ul>
+        <li>recibe información,</li>
+        <li>la selecciona,</li>
+        <li>la transforma,</li>
+        <li>la almacena,</li>
+        <li>la recupera,</li>
+        <li>la utiliza para actuar.</li>
+      </ul>
+      <div class="ejemplo-cotidiano">Cuando lees una noticia: no solo la ves, la interpretas, la recuerdas y decides si la compartes. Todos esos pasos son operaciones cognitivas.</div>
+    </section>
+
+    <!-- 15. ANIMACIÓN 3: MODELO MULTIALMACÉN -->
+    <section class="slide" id="slide-15">
+      <span class="etiqueta anim">Animación 3</span>
+      <h2>Modelo multialmacén en acción (Atkinson &amp; Shiffrin)</h2>
+      <p>Mira cómo la información fluye entre los tres almacenes. Pulsa cada botón para ver un escenario distinto.</p>
+      <div class="anim-wrap">
+        <div class="anim-controles">
+          <button id="anim3-simple">▶ Estímulo simple</button>
+          <button id="anim3-sinrepaso" class="dorado">▶ Sin repaso</button>
+          <button id="anim3-conrepaso" class="verde">▶ Con repaso y codificación</button>
+          <button id="anim3-reset">↻ Reiniciar</button>
+        </div>
+        <canvas id="anim3-canvas" class="anim-canvas" width="880" height="400"></canvas>
+        <div class="anim-narracion" id="anim3-narr">Pulsa un botón para ver la animación.</div>
+      </div>
+      <div class="ejemplo-cotidiano">Recordar un número de teléfono por unos segundos vs. aprenderlo definitivamente: dos rutas distintas dentro del mismo sistema.</div>
+    </section>
+
+    <!-- 16. MEMORIA DE TRABAJO -->
+    <section class="slide" id="slide-16">
+      <span class="etiqueta">Unidad 1 · Memoria de trabajo</span>
+      <h2>Memoria de trabajo (Baddeley &amp; Hitch, 1974)</h2>
+      <div class="cita">Permite <strong>mantener y manipular activamente información durante una tarea</strong>. No es solo almacenar: es operar sobre lo que se mantiene.</div>
+      <div class="tarjetas">
+        <div class="tarjeta"><h4>Bucle fonológico</h4><p>Información verbal y auditiva.</p></div>
+        <div class="tarjeta"><h4>Agenda visoespacial</h4><p>Información visual y espacial.</p></div>
+        <div class="tarjeta"><h4>Ejecutivo central</h4><p>Coordina los recursos atencionales y los otros componentes.</p></div>
+      </div>
+      <div class="ejemplo-cotidiano">Calcular mentalmente "17 % de 240.000" exige mantener cifras, operar sobre ellas y producir un resultado: eso es memoria de trabajo en acción.</div>
+    </section>
+
+    <!-- 17. SIMULACIÓN -->
+    <section class="slide" id="slide-17">
+      <span class="etiqueta dorada">Simulación interactiva</span>
+      <h2>Memoria de trabajo en acción</h2>
+      <p>Ajusta las condiciones de una tarea de span numérico. Observa cómo cambia la probabilidad estimada de éxito y qué componente se ve más exigido.</p>
+      <div class="simulacion">
+        <div class="controles">
+          <div class="control">
+            <label>Longitud de la secuencia <span id="val-long">5</span></label>
+            <input type="range" id="long" min="2" max="12" value="5">
+          </div>
+          <div class="control">
+            <label>Carga concurrente (tarea paralela) <span id="val-carga">30</span></label>
+            <input type="range" id="carga" min="0" max="100" value="30">
+          </div>
+          <div class="control">
+            <label>Modalidad visual (vs. verbal) <span id="val-modal">30</span></label>
+            <input type="range" id="modal" min="0" max="100" value="30">
+          </div>
+          <div class="control">
+            <label>Estrategia de agrupamiento <span id="val-estrategia">40</span></label>
+            <input type="range" id="estrategia" min="0" max="100" value="40">
+          </div>
+        </div>
+        <div id="sim-canvas-wrap">
+          <canvas id="sim-canvas" width="540" height="360"></canvas>
+          <div id="sim-mensaje">Ajusta los controles para ver el resultado.</div>
+        </div>
+      </div>
+      <div class="ejemplo-cotidiano">Recordar 8 dígitos sin estrategia es más difícil que recordarlos agrupados como "72 91 34 50".</div>
+    </section>
+
+    <!-- 18. CODIFICACIÓN -->
+    <section class="slide" id="slide-18">
+      <span class="etiqueta">Unidad 1 · Procesos</span>
+      <h2>Codificación, almacenamiento y recuperación</h2>
+      <div class="tarjetas">
+        <div class="tarjeta"><h4>Codificación</h4><p>Transformar la información recibida en una forma que pueda ser procesada y almacenada.</p></div>
+        <div class="tarjeta"><h4>Almacenamiento</h4><p>Conservar la información en los sistemas de memoria.</p></div>
+        <div class="tarjeta"><h4>Recuperación</h4><p>Acceder posteriormente a la información para pensar, resolver problemas o decidir.</p></div>
+      </div>
+      <div class="destacado">El olvido puede relacionarse con <strong>interferencia</strong> o con dificultades en la <strong>recuperación</strong>. No es siempre un problema de almacenamiento.</div>
+      <div class="ejemplo-cotidiano">Saber una palabra y "tenerla en la punta de la lengua" es un problema de recuperación, no de almacenamiento.</div>
+    </section>
+
+    <!-- 19. CONEXIONISMO -->
+    <section class="slide" id="slide-19">
+      <span class="etiqueta">Unidad 1 · Segundo gran modelo</span>
+      <h2>Conexionismo: la otra gran mirada</h2>
+      <div class="cita">A diferencia del procesamiento secuencial, el conexionismo concibe la actividad cognitiva mediante <strong>redes de unidades interconectadas</strong>.</div>
+      <div class="tarjetas">
+        <div class="tarjeta"><h4>Conceptos clave</h4><ul style="margin-left:20px;font-size:19px;"><li>Redes neuronales</li><li>Procesamiento distribuido</li><li>Procesamiento paralelo</li><li>Patrones de activación</li></ul></div>
+        <div class="tarjeta"><h4>Autores</h4><ul style="margin-left:20px;font-size:19px;"><li>McCulloch &amp; Pitts: modelos matemáticos</li><li>Hebb: fortalecimiento de conexiones</li><li>Rumelhart &amp; McClelland: procesamiento distribuido en paralelo</li></ul></div>
+      </div>
+      <div class="destacado">Dos maneras de pensar la cognición: como <strong>procesamiento secuencial de información</strong> o como <strong>actividad emergente de redes</strong>. No se excluyen: se complementan.</div>
+    </section>
+
+    <!-- 20. ACTIVIDAD -->
+    <section class="slide" id="slide-20">
+      <span class="etiqueta dorada">Actividad</span>
+      <h2>¿Procesamiento de información o conexionismo?</h2>
+      <p>Lee cada afirmación y decide a qué modelo describe mejor. Recibirás retroalimentación.</p>
+      <div class="actividad" id="act-modelos"></div>
+      <button class="btn btn-sec" id="reiniciar-modelos" style="margin-top:14px;">Reiniciar actividad</button>
+    </section>
+
+    <!-- 21. UNIDAD 2 MAPA -->
+    <section class="slide" id="slide-21">
+      <span class="etiqueta unidad2">Unidad 2</span>
+      <h2>Modelo práctico: aplicaciones del enfoque cognitivo</h2>
+      <div class="tarjetas">
+        <div class="tarjeta"><h4>1. Terapias cognitivas</h4><p>Beck y Ellis: relación entre pensamientos, emociones y conducta.</p></div>
+        <div class="tarjeta"><h4>2. Aplicabilidad contextual</h4><p>Psicología clínica, educativa y otros contextos de intervención.</p></div>
+        <div class="tarjeta"><h4>3. Neurociencia cognitiva</h4><p>Bases biológicas de procesos como memoria, atención y lenguaje.</p></div>
+        <div class="tarjeta"><h4>4. Educación</h4><p>Aprendizaje, memoria, conocimientos previos y estrategias cognitivas.</p></div>
+      </div>
+      <div class="destacado">La Unidad 2 convierte los modelos en <strong>herramientas de intervención</strong>: pasa del "cómo funciona la mente" al "cómo usar ese conocimiento".</div>
+    </section>
+
+    <!-- 22. BECK Y ELLIS -->
+    <section class="slide" id="slide-22">
+      <span class="etiqueta">Unidad 2 · Clínica</span>
+      <h2>Beck y Ellis: terapias cognitivas</h2>
+      <div class="tarjetas">
+        <div class="tarjeta"><h4>Aaron Beck</h4><p>Contribuyó al desarrollo de las terapias cognitivas y al análisis de los pensamientos y patrones cognitivos relacionados con distintos problemas psicológicos.</p></div>
+        <div class="tarjeta"><h4>Albert Ellis</h4><p>Perspectiva centrada en las relaciones entre <strong>acontecimientos → creencias → consecuencias</strong> emocionales y conductuales.</p></div>
+      </div>
+      <div class="destacado">El recorrido conceptual es: <strong>modelo cognitivo → interpretación de la experiencia → cognición → emoción/conducta → intervención psicológica</strong>.</div>
+      <div class="ejemplo-cotidiano">Dos personas viven el mismo evento; una lo interpreta como amenaza y otra como reto. La diferencia no está en el evento, sino en la interpretación.</div>
+    </section>
+
+    <!-- 23. NEUROCIENCIA Y EDUCACIÓN -->
+    <section class="slide" id="slide-23">
+      <span class="etiqueta">Unidad 2 · Aplicaciones</span>
+      <h2>Cognición, neurociencia y educación</h2>
+      <div class="tarjetas">
+        <div class="tarjeta"><h4>Neurociencia cognitiva</h4><p>Integración entre psicología cognitiva y neurociencia para estudiar bases biológicas de memoria, atención y lenguaje. Técnicas como la resonancia magnética funcional.</p></div>
+        <div class="tarjeta"><h4>Educación</h4><p>Aprendizaje, memoria, organización del conocimiento, conocimientos previos, práctica distribuida, recuperación activa y estrategias de enseñanza.</p></div>
+      </div>
+      <div class="destacado">La psicología cognitiva permite <strong>puentear la explicación de los procesos mentales con el diseño de experiencias de aprendizaje</strong>.</div>
+      <div class="ejemplo-cotidiano">Estudiar distribuido en el tiempo rinde más que estudiar todo la noche anterior: principio cognitivo aplicado a la educación.</div>
+    </section>
+
+    <!-- 24. CIERRE -->
+    <section class="slide" id="slide-24">
+      <span class="etiqueta dorada">Cierre</span>
+      <h2>Del filósofo al terapeuta: la línea del curso</h2>
+      <div class="destacado">
+        El curso conduce al estudiante desde las preguntas filosóficas sobre el conocimiento, pasando por la psicología experimental y el conductismo, hasta la revolución cognitiva, los modelos de procesamiento de información y conexionismo, para finalmente abordar sus aplicaciones en psicología clínica, educación y neurociencias.
+      </div>
+      <h3>Ideas para llevarte</h3>
+      <ul>
+        <li>El enfoque cognitivo surge como resultado de una evolución intelectual, no de un solo autor.</li>
+        <li>La revolución cognitiva reabre el estudio científico de los procesos mentales.</li>
+        <li>La mente puede pensarse como procesador de información y como red de unidades interconectadas.</li>
+        <li>Los modelos cognitivos tienen aplicaciones concretas en clínica, educación y neurociencia.</li>
+        <li>Comprender un modelo exige entender también su contexto histórico y sus límites.</li>
+      </ul>
+      <h3>Referencias fundamentales</h3>
+      <p style="font-size:16px;line-height:1.55;">
+        Atkinson, R. C., &amp; Shiffrin, R. M. (1968). Human memory: A proposed system and its control processes. En K. W. Spence &amp; J. T. Spence (Eds.), <em>The psychology of learning and motivation</em> (Vol. 2). Academic Press.<br>
+        Baddeley, A. D., &amp; Hitch, G. (1974). Working memory. En G. H. Bower (Ed.), <em>The psychology of learning and motivation</em> (Vol. 8). Academic Press.<br>
+        Beck, A. T. (1976). <em>Cognitive therapy and the emotional disorders</em>. International Universities Press.<br>
+        Ellis, A. (1962). <em>Reason and emotion in psychotherapy</em>. Lyle Stuart.<br>
+        Miller, G. A. (1956). The magical number seven, plus or minus two. <em>Psychological Review, 63</em>(2), 81–97.<br>
+        Neisser, U. (1967). <em>Cognitive psychology</em>. Appleton-Century-Crofts.<br>
+        Piaget, J. (1970). Piaget's theory. En P. H. Mussen (Ed.), <em>Carmichael's manual of child psychology</em>. Wiley.<br>
+        Rumelhart, D. E., &amp; McClelland, J. L. (1986). <em>Parallel distributed processing</em>. MIT Press.
+      </p>
+    </section>
+
+  </main>
+</div>
+
+<div id="contador">1 / 24</div>
+<div id="controles-nav">
+  <button id="btn-prev" title="Anterior (←)">‹</button>
+  <button id="btn-next" title="Siguiente (→)">›</button>
+</div>
+
+<script>
+/* ============================================================
+   1. NAVEGACIÓN
+   ============================================================ */
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let actual = 0;
+const barraProgreso = document.getElementById('barra-progreso');
+const contador = document.getElementById('contador');
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
+const enlaces = document.querySelectorAll('#sidebar nav a');
+
+function irA(indice){
+  if(indice < 0 || indice >= totalSlides) return;
+  slides[actual].classList.remove('activa');
+  actual = indice;
+  slides[actual].classList.add('activa');
+  slides[actual].scrollTop = 0;
+  barraProgreso.style.width = ((actual+1)/totalSlides*100) + '%';
+  contador.textContent = (actual+1) + ' / ' + totalSlides;
+  btnPrev.disabled = actual === 0;
+  btnNext.disabled = actual === totalSlides - 1;
+  enlaces.forEach(a => a.classList.toggle('activo', parseInt(a.dataset.ir) === actual+1));
+}
+btnPrev.addEventListener('click', () => irA(actual-1));
+btnNext.addEventListener('click', () => irA(actual+1));
+enlaces.forEach(a => a.addEventListener('click', () => irA(parseInt(a.dataset.ir)-1)));
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); irA(actual+1); }
+  if(e.key === 'ArrowLeft'){ e.preventDefault(); irA(actual-1); }
+  if(e.key === 'Home'){ e.preventDefault(); irA(0); }
+  if(e.key === 'End'){ e.preventDefault(); irA(totalSlides-1); }
+});
+const sidebar = document.getElementById('sidebar');
+const toggle = document.getElementById('toggleSidebar');
+toggle.addEventListener('click', () => {
+  sidebar.classList.toggle('oculto');
+  toggle.classList.toggle('oculto');
+});
+irA(0);
+
+/* ============================================================
+   2. ANIMACIÓN 1: LÍNEA DE TIEMPO FILOSÓFICA
+   ============================================================ */
+const anim1Items = document.querySelectorAll('#anim1-linea .filo-item');
+const anim1Narr = document.getElementById('anim1-narr');
+const anim1Textos = [
+  'Platón (s. IV a.C.): el conocimiento verdadero se relaciona con ideas o formas abstractas, no solo con la experiencia sensorial.',
+  'Aristóteles (s. IV a.C.): la experiencia y los sentidos tienen un papel central en el conocimiento.',
+  'Descartes (s. XVII): dualismo mente-cuerpo. La mente como ámbito del razonamiento y la conciencia.',
+  'Locke (s. XVII): empirismo. La mente es una tabula rasa que se llena con la experiencia.',
+  'Kant (s. XVIII): síntesis. La mente no es pasiva: posee estructuras que organizan la experiencia.'
+];
+let anim1Timeouts = [];
+function anim1Reset(){
+  anim1Timeouts.forEach(t => clearTimeout(t));
+  anim1Timeouts = [];
+  anim1Items.forEach(it => it.classList.remove('activo'));
+  anim1Narr.textContent = 'Pulsa "Reproducir recorrido" para ver la línea.';
+}
+function anim1Play(){
+  anim1Reset();
+  anim1Items.forEach((it, i) => {
+    const t = setTimeout(() => {
+      anim1Items.forEach(x => x.classList.remove('activo'));
+      it.classList.add('activo');
+      anim1Narr.textContent = anim1Textos[i];
+    }, i * 1600);
+    anim1Timeouts.push(t);
+  });
+  const tFin = setTimeout(() => {
+    anim1Items.forEach(x => x.classList.remove('activo'));
+    anim1Narr.textContent = 'Kant abre la puerta a la idea de una mente activa. Sin esta idea, no se entendería después el concepto de procesamiento cognitivo.';
+  }, anim1Items.length * 1600 + 500);
+  anim1Timeouts.push(tFin);
+}
+document.getElementById('anim1-play').addEventListener('click', anim1Play);
+document.getElementById('anim1-reset').addEventListener('click', anim1Reset);
+
+/* ============================================================
+   3. ANIMACIÓN 2: CONDUCTISMO → COGNITIVISMO
+   ============================================================ */
+const anim2Canvas = document.getElementById('anim2-canvas');
+const anim2Ctx = anim2Canvas.getContext('2d');
+const anim2Narr = document.getElementById('anim2-narr');
+let anim2RAF = null;
+
+function anim2Fondo(){
+  anim2Ctx.fillStyle = '#FBFCFE';
+  anim2Ctx.fillRect(0,0,anim2Canvas.width,anim2Canvas.height);
+}
+function anim2Escena(vista){
+  anim2Fondo();
+  // Estímulo
+  anim2Ctx.fillStyle = '#13538A';
+  anim2Ctx.fillRect(40, 180, 120, 70);
+  anim2Ctx.fillStyle = '#FFFFFF';
+  anim2Ctx.font = '800 22px Segoe UI, Arial';
+  anim2Ctx.textAlign = 'center';
+  anim2Ctx.fillText('E', 100, 222);
+  anim2Ctx.font = '600 16px Segoe UI, Arial';
+  anim2Ctx.fillStyle = '#0B2545';
+  anim2Ctx.fillText('estímulo', 100, 275);
+
+  // Respuesta
+  anim2Ctx.fillStyle = '#1E7A46';
+  anim2Ctx.fillRect(720, 180, 120, 70);
+  anim2Ctx.fillStyle = '#FFFFFF';
+  anim2Ctx.font = '800 22px Segoe UI, Arial';
+  anim2Ctx.fillText('R', 780, 222);
+  anim2Ctx.font = '600 16px Segoe UI, Arial';
+  anim2Ctx.fillStyle = '#0B2545';
+  anim2Ctx.fillText('respuesta', 780, 275);
+
+  // Flecha E-R
+  anim2Ctx.strokeStyle = '#E7C873';
+  anim2Ctx.lineWidth = 4;
+  anim2Ctx.beginPath();
+  anim2Ctx.moveTo(180, 215);
+  anim2Ctx.lineTo(700, 215);
+  anim2Ctx.stroke();
+  anim2Ctx.beginPath();
+  anim2Ctx.moveTo(700, 215);
+  anim2Ctx.lineTo(686, 205);
+  anim2Ctx.lineTo(686, 225);
+  anim2Ctx.closePath();
+  anim2Ctx.fillStyle = '#E7C873';
+  anim2Ctx.fill();
+
+  if(vista === 'conductismo'){
+    // Caja negra
+    anim2Ctx.fillStyle = '#1F2A37';
+    anim2Ctx.fillRect(320, 130, 240, 170);
+    anim2Ctx.fillStyle = '#FFFFFF';
+    anim2Ctx.font = '800 22px Segoe UI, Arial';
+    anim2Ctx.textAlign = 'center';
+    anim2Ctx.fillText('caja negra', 440, 200);
+    anim2Ctx.font = '600 16px Segoe UI, Arial';
+    anim2Ctx.fillText('procesos internos', 440, 230);
+    anim2Ctx.fillText('no observables', 440, 255);
+  } else {
+    // Caja abierta con procesos internos
+    anim2Ctx.fillStyle = '#E3F0FA';
+    anim2Ctx.fillRect(320, 130, 240, 170);
+    anim2Ctx.strokeStyle = '#13538A';
+    anim2Ctx.lineWidth = 3;
+    anim2Ctx.strokeRect(320, 130, 240, 170);
+
+    const procesos = ['atención', 'memoria', 'lenguaje', 'pensamiento'];
+    anim2Ctx.fillStyle = '#0B2545';
+    anim2Ctx.font = '700 20px Segoe UI, Arial';
+    anim2Ctx.textAlign = 'center';
+    procesos.forEach((p, i) => {
+      const y = 165 + i*30;
+      anim2Ctx.fillText(p, 440, y);
+      if(i < procesos.length-1){
+        anim2Ctx.strokeStyle = '#13538A';
+        anim2Ctx.lineWidth = 1.5;
+        anim2Ctx.beginPath();
+        anim2Ctx.moveTo(400, y+8);
+        anim2Ctx.lineTo(480, y+8);
+        anim2Ctx.stroke();
+      }
+    });
+  }
+}
+function anim2Reset(){
+  if(anim2RAF) cancelAnimationFrame(anim2RAF);
+  anim2Escena('inicial');
+  anim2Narr.textContent = 'Pulsa un botón para ver cada enfoque.';
+}
+function anim2Vista(tipo){
+  if(anim2RAF) cancelAnimationFrame(anim2RAF);
+  anim2Escena(tipo);
+  anim2Narr.textContent = tipo === 'conductismo'
+    ? 'Vista conductista: solo importan el estímulo (E) y la respuesta (R). Lo que ocurre entre ambos se considera una "caja negra" no observable.'
+    : 'Vista cognitiva: entre el estímulo y la respuesta operan procesos internos —atención, memoria, lenguaje, pensamiento— que son objeto de estudio científico.';
+}
+document.getElementById('anim2-conductismo').addEventListener('click', () => anim2Vista('conductismo'));
+document.getElementById('anim2-cognitivismo').addEventListener('click', () => anim2Vista('cognitivismo'));
+document.getElementById('anim2-reset').addEventListener('click', anim2Reset);
+anim2Reset();
+
+/* ============================================================
+   4. ANIMACIÓN 3: MODELO MULTIALMACÉN
+   ============================================================ */
+const anim3Canvas = document.getElementById('anim3-canvas');
+const anim3Ctx = anim3Canvas.getContext('2d');
+const anim3Narr = document.getElementById('anim3-narr');
+let anim3RAF = null;
+
+function anim3Fondo(){
+  anim3Ctx.fillStyle = '#FBFCFE';
+  anim3Ctx.fillRect(0,0,anim3Canvas.width,anim3Canvas.height);
+}
+function cajaAlmacen(x, y, w, h, titulo, subtitulo, llenado, colorFondo){
+  anim3Ctx.fillStyle = colorFondo || '#FFFFFF';
+  anim3Ctx.fillRect(x, y, w, h);
+  anim3Ctx.strokeStyle = '#0B2545';
+  anim3Ctx.lineWidth = 3;
+  anim3Ctx.strokeRect(x, y, w, h);
+  anim3Ctx.fillStyle = '#0B2545';
+  anim3Ctx.font = '800 20px Segoe UI, Arial';
+  anim3Ctx.textAlign = 'center';
+  anim3Ctx.fillText(titulo, x + w/2, y + 30);
+  anim3Ctx.font = '600 15px Segoe UI, Arial';
+  anim3Ctx.fillStyle = '#13538A';
+  anim3Ctx.fillText(subtitulo, x + w/2, y + 55);
+
+  // Llenado con puntitos
+  if(llenado > 0){
+    anim3Ctx.fillStyle = '#13538A';
+    for(let i=0; i<llenado; i++){
+      anim3Ctx.beginPath();
+      anim3Ctx.arc(x + 30 + (i*22) % (w-60), y + 90 + Math.floor(i/6)*22, 6, 0, Math.PI*2);
+      anim3Ctx.fill();
+    }
+  }
+}
+function anim3Escena(estado){
+  anim3Fondo();
+
+  const y = 130;
+  const w = 200;
+  const h = 180;
+
+  // Estímulo
+  anim3Ctx.fillStyle = '#E7C873';
+  anim3Ctx.fillRect(30, y+60, 100, 60);
+  anim3Ctx.fillStyle = '#0B2545';
+  anim3Ctx.font = '800 18px Segoe UI, Arial';
+  anim3Ctx.textAlign = 'center';
+  anim3Ctx.fillText('entrada', 80, y+40);
+  anim3Ctx.font = '800 22px Segoe UI, Arial';
+  anim3Ctx.fillText('👁', 80, y+100);
+
+  // Flecha
+  anim3Ctx.strokeStyle = '#0B2545';
+  anim3Ctx.lineWidth = 3;
+  anim3Ctx.beginPath();
+  anim3Ctx.moveTo(140, y+90);
+  anim3Ctx.lineTo(170, y+90);
+  anim3Ctx.stroke();
+
+  // Memoria sensorial
+  cajaAlmacen(180, y, w, h, 'Sensorial', 'breve · ~1 s', estado.sensorial, '#E3F0FA');
+
+  // Flecha
+  anim3Ctx.beginPath();
+  anim3Ctx.moveTo(390, y+90);
+  anim3Ctx.lineTo(430, y+90);
+  anim3Ctx.stroke();
+
+  // Memoria a corto plazo
+  cajaAlmacen(440, y, w, h, 'Corto plazo', '~7 ítems', estado.corto, '#FFF8E7');
+
+  // Flecha (depende del caso)
+  anim3Ctx.strokeStyle = estado.sentido ? '#1E7A46' : '#E9EEF5';
+  anim3Ctx.lineWidth = estado.sentido ? 4 : 2;
+  anim3Ctx.beginPath();
+  anim3Ctx.moveTo(650, y+90);
+  anim3Ctx.lineTo(690, y+90);
+  anim3Ctx.stroke();
+
+  // Memoria a largo plazo
+  cajaAlmacen(700, y, w, h, 'Largo plazo', 'duradera', estado.largo, '#E3F4E9');
+
+  // Mensaje contextual
+  if(estado.texto){
+    anim3Ctx.fillStyle = '#0B2545';
+    anim3Ctx.font = '800 22px Segoe UI, Arial';
+    anim3Ctx.textAlign = 'center';
+    anim3Ctx.fillText(estado.texto, anim3Canvas.width/2, anim3Canvas.height - 30);
+  }
+}
+function anim3Reset(){
+  if(anim3RAF) cancelAnimationFrame(anim3RAF);
+  anim3Escena({sensorial:0, corto:0, largo:0, sentido:false, texto:''});
+  anim3Narr.textContent = 'Pulsa un botón para ver la animación.';
+}
+function anim3Simple(){
+  if(anim3RAF) cancelAnimationFrame(anim3RAF);
+  const pasos = [
+    {t:0,   s:{sensorial:3, corto:0, largo:0, sentido:false, texto:'Entra un estímulo'}, n:'Un estímulo entra por los sentidos y se registra brevemente.'},
+    {t:100, s:{sensorial:5, corto:0, largo:0, sentido:false, texto:'Registro sensorial'}, n:'La memoria sensorial mantiene la información durante un instante.'},
+    {t:220, s:{sensorial:0, corto:3, largo:0, sentido:false, texto:'Atención: pasa a corto plazo'}, n:'Si prestamos atención, la información pasa a la memoria a corto plazo.'},
+    {t:340, s:{sensorial:0, corto:0, largo:0, sentido:false, texto:'Sin repaso, se pierde'}, n:'Sin repaso, la información se pierde rápidamente.'}
+  ];
+  let idx = 0, frame = 0;
+  function loop(){
+    if(idx >= pasos.length) return;
+    const p = pasos[idx];
+    if(frame >= p.t){ anim3Narr.textContent = p.n; anim3Escena(p.s); idx++; }
+    frame++;
+    if(idx < pasos.length) anim3RAF = requestAnimationFrame(loop);
+  }
+  loop();
+}
+function anim3SinRepaso(){
+  if(anim3RAF) cancelAnimationFrame(anim3RAF);
+  const pasos = [
+    {t:0,   s:{sensorial:3, corto:2, largo:0, sentido:false, texto:'Estímulo presente'}, n:'El estímulo llega y se mantiene brevemente.'},
+    {t:100, s:{sensorial:0, corto:4, largo:0, sentido:false, texto:'En corto plazo'}, n:'Sin estrategia, la información ocupa el corto plazo pero decae rápido.'},
+    {t:250, s:{sensorial:0, corto:1, largo:0, sentido:false, texto:'Decae sin repaso'}, n:'La falta de repaso hace que la información se pierda.'},
+    {t:400, s:{sensorial:0, corto:0, largo:0, sentido:false, texto:'Olvido'}, n:'Resultado: la información no se consolidó en el largo plazo.'}
+  ];
+  let idx = 0, frame = 0;
+  function loop(){
+    if(idx >= pasos.length) return;
+    const p = pasos[idx];
+    if(frame >= p.t){ anim3Narr.textContent = p.n; anim3Escena(p.s); idx++; }
+    frame++;
+    if(idx < pasos.length) anim3RAF = requestAnimationFrame(loop);
+  }
+  loop();
+}
+function anim3ConRepaso(){
+  if(anim3RAF) cancelAnimationFrame(anim3RAF);
+  const pasos = [
+    {t:0,   s:{sensorial:3, corto:2, largo:0, sentido:false, texto:'Llega el estímulo'}, n:'El estímulo llega a la memoria sensorial.'},
+    {t:100, s:{sensorial:0, corto:4, largo:0, sentido:false, texto:'Atención y codificación'}, n:'La atención y la codificación llevan la información al corto plazo.'},
+    {t:250, s:{sensorial:0, corto:5, largo:0, sentido:false, texto:'Repaso activo'}, n:'El repaso activo mantiene la información disponible.'},
+    {t:400, s:{sensorial:0, corto:5, largo:5, sentido:true, texto:'Consolidación en largo plazo'}, n:'Con repaso y codificación significativa, la información pasa al largo plazo.'},
+    {t:550, s:{sensorial:0, corto:3, largo:6, sentido:true, texto:'Disponible para recuperar'}, n:'La información consolidada puede recuperarse después para pensar y decidir.'}
+  ];
+  let idx = 0, frame = 0;
+  function loop(){
+    if(idx >= pasos.length) return;
+    const p = pasos[idx];
+    if(frame >= p.t){ anim3Narr.textContent = p.n; anim3Escena(p.s); idx++; }
+    frame++;
+    if(idx < pasos.length) anim3RAF = requestAnimationFrame(loop);
+  }
+  loop();
+}
+document.getElementById('anim3-simple').addEventListener('click', anim3Simple);
+document.getElementById('anim3-sinrepaso').addEventListener('click', anim3SinRepaso);
+document.getElementById('anim3-conrepaso').addEventListener('click', anim3ConRepaso);
+document.getElementById('anim3-reset').addEventListener('click', anim3Reset);
+anim3Reset();
+
+/* ============================================================
+   5. SIMULACIÓN: MEMORIA DE TRABAJO
+   ============================================================ */
+const canvas = document.getElementById('sim-canvas');
+const ctx = canvas.getContext('2d');
+const longEl = document.getElementById('long');
+const cargaEl = document.getElementById('carga');
+const modalEl = document.getElementById('modal');
+const estrategiaEl = document.getElementById('estrategia');
+const valLong = document.getElementById('val-long');
+const valCarga = document.getElementById('val-carga');
+const valModal = document.getElementById('val-modal');
+const valEstrategia = document.getElementById('val-estrategia');
+const mensajeEl = document.getElementById('sim-mensaje');
+
+function calcularExito(){
+  const L = +longEl.value;
+  const C = +cargaEl.value;
+  const M = +modalEl.value;
+  const E = +estrategiaEl.value;
+
+  // Span "natural" ~7, penalizado por carga concurrente, beneficiado por estrategia y algo mejor si es verbal
+  const base = 7 - (L - 7) * 8;      // cada ítem por encima de 7 resta fuerte
+  const penalCarga = C * 0.45;
+  const penalModal = M * 0.15;
+  const bonusEstrategia = E * 0.35;
+
+  let exito = 90 + base - penalCarga - penalModal + bonusEstrategia;
+  exito = Math.max(2, Math.min(99, Math.round(exito)));
+
+  // Componente más exigido
+  let componente = 'Bucle fonológico';
+  if(M > 60) componente = 'Agenda visoespacial';
+  if(C > 60) componente = 'Ejecutivo central';
+
+  return {exito, componente, L, C, M, E};
+}
+
+function dibujarSim(d){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Secuencia de dígitos
+  const secuencia = '7 2 9 4 1 8 3 6 5 0 2 7'.split(' ').slice(0, d.L);
+  const y = 60;
+  ctx.fillStyle = '#0B2545';
+  ctx.font = '800 20px Segoe UI, Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Secuencia a memorizar:', canvas.width/2, y - 20);
+
+  ctx.font = '800 38px Segoe UI, Arial';
+  ctx.fillStyle = '#13538A';
+  ctx.fillText(secuencia.join(' '), canvas.width/2, y + 40);
+
+  // Medidor de éxito
+  const cx = canvas.width/2;
+  const cy = 220;
+  const r = 80;
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, Math.PI, 2*Math.PI);
+  ctx.lineWidth = 20;
+  ctx.strokeStyle = '#E9EEF5';
+  ctx.stroke();
+
+  const angulo = Math.PI + (d.exito/100)*Math.PI;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, Math.PI, angulo);
+  let color;
+  if(d.exito > 70) color = '#1E7A46';
+  else if(d.exito > 40) color = '#D4A017';
+  else color = '#B3261E';
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 20;
+  ctx.stroke();
+
+  ctx.fillStyle = '#0B2545';
+  ctx.font = '800 30px Segoe UI, Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(d.exito + '%', cx, cy - 10);
+  ctx.font = '700 14px Segoe UI, Arial';
+  ctx.fillStyle = '#13315C';
+  ctx.fillText('probabilidad de éxito', cx, cy + 30);
+
+  // Componente más exigido
+  ctx.fillStyle = '#0B2545';
+  ctx.font = '700 18px Segoe UI, Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Componente más exigido:', canvas.width/2, 330);
+  ctx.fillStyle = '#E7C873';
+  ctx.font = '800 22px Segoe UI, Arial';
+  ctx.fillText(d.componente, canvas.width/2, 355);
+}
+
+function generarMensaje(d){
+  if(d.exito >= 75){
+    return {txt:'🟢 Alta probabilidad de éxito: la secuencia es manejable y las condiciones favorecen el desempeño. El bucle fonológico o la agenda visoespacial trabajan con margen.', bg:'#E3F4E9', col:'#1E7A46'};
+  }
+  if(d.exito >= 45){
+    return {txt:'🟡 Desempeño intermedio: la memoria de trabajo está operando cerca de su límite. La estrategia de agrupamiento (chunking) ayuda mucho.', bg:'#FFF8E7', col:'#8A6D1A'};
+  }
+  if(d.C >= 60){
+    return {txt:'🟠 Sobrecarga del ejecutivo central: hay una tarea paralela consumiendo recursos. El ejecutivo central no puede coordinar bien.', bg:'#FDEBD3', col:'#A15C13'};
+  }
+  return {txt:'🔴 Alta probabilidad de error: la longitud excede la capacidad típica (7 ± 2). Es el hallazgo clásico de Miller (1956).', bg:'#FBE9E7', col:'#B3261E'};
+}
+
+function actualizarSim(){
+  valLong.textContent = longEl.value;
+  valCarga.textContent = cargaEl.value;
+  valModal.textContent = modalEl.value;
+  valEstrategia.textContent = estrategiaEl.value;
+
+  const d = calcularExito();
+  dibujarSim(d);
+  const m = generarMensaje(d);
+  mensajeEl.textContent = m.txt;
+  mensajeEl.style.background = m.bg;
+  mensajeEl.style.color = m.col;
+}
+[longEl, cargaEl, modalEl, estrategiaEl].forEach(el => el.addEventListener('input', actualizarSim));
+actualizarSim();
+
+/* ============================================================
+   6. ACTIVIDAD: MODELOS
+   ============================================================ */
+const datosModelos = [
+  {texto:'La mente procesa la información en etapas secuenciales.', correcta:'procesamiento',
+   expl:'Modelo multialmacén y procesamiento de información: la mente como sistema secuencial.'},
+  {texto:'La cognición emerge de la activación simultánea de muchas unidades interconectadas.', correcta:'conexionismo',
+   expl:'Procesamiento distribuido en paralelo: no es secuencial, es paralelo y emergente.'},
+  {texto:'Existe una memoria sensorial, una a corto plazo y una a largo plazo.', correcta:'procesamiento',
+   expl:'Modelo multialmacén de Atkinson y Shiffrin.'},
+  {texto:'El aprendizaje se produce por el fortalecimiento de las conexiones entre unidades.', correcta:'conexionismo',
+   expl:'Propuesta de Hebb: cuando dos neuronas se activan juntas, la conexión se refuerza.'},
+  {texto:'La información se codifica, almacena y posteriormente se recupera.', correcta:'procesamiento',
+   expl:'Operaciones fundamentales del modelo de procesamiento de información.'},
+  {texto:'El reconocimiento de patrones surge de la activación distribuida en la red.', correcta:'conexionismo',
+   expl:'Aprendizaje profundo y redes neuronales artificiales derivan de esta idea.'},
+  {texto:'La memoria de trabajo mantiene y manipula información durante una tarea.', correcta:'procesamiento',
+   expl:'Modelo de Baddeley y Hitch (1974).'},
+  {texto:'Una misma representación puede activarse parcialmente y completarse por el patrón global.', correcta:'conexionismo',
+   expl:'Propiedad típica de las redes: activación por patrones, no por reglas secuenciales.'}
+];
+function construirActividadModelos(){
+  const cont = document.getElementById('act-modelos');
+  cont.innerHTML = '';
+  datosModelos.forEach((d) => {
+    const div = document.createElement('div');
+    div.className = 'clasif-item';
+    div.innerHTML = `
+      <div>${d.texto}</div>
+      <div class="opciones">
+        <button data-op="procesamiento">Procesamiento de información</button>
+        <button data-op="conexionismo">Conexionismo</button>
+      </div>
+      <div class="explicacion"></div>`;
+    cont.appendChild(div);
+    div.querySelectorAll('.opciones button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if(div.classList.contains('resuelto')) return;
+        const botones = div.querySelectorAll('.opciones button');
+        if(btn.dataset.op === d.correcta){
+          btn.classList.add('ok');
+          div.classList.add('resuelto');
+          div.querySelector('.explicacion').textContent = '✅ ' + d.expl;
+          botones.forEach(b => b.disabled = true);
+        } else {
+          btn.classList.add('no');
+          const ex = div.querySelector('.explicacion');
+          ex.textContent = '❌ Revisa: ¿describe un flujo secuencial o una red distribuida?';
+          ex.style.display = 'block';
+        }
+      });
+    });
+  });
+}
+construirActividadModelos();
+document.getElementById('reiniciar-modelos').addEventListener('click', construirActividadModelos);
+</script>
+</body>
+</html>
