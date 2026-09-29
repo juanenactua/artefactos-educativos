@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Investigación cuantitativa y cualitativa — Artefacto interactivo</title>
+
+<!-- ============================================================
+     ESTILOS
+     Paleta: blanco, azul oscuro #0B2545, acentos #13315C/#13538A,
+     dorado #E7C873 con moderación. Tipografía grande para TV.
+     ============================================================ -->
+<style>
+  :root{
+    --azul-oscuro:#0B2545;
+    --azul-medio:#13315C;
+    --azul-acento:#13538A;
+    --dorado:#E7C873;
+    --gris-calido:#F4F1EC;
+    --texto:#12203A;
+    --texto-suave:#3E4E68;
+    --blanco:#FFFFFF;
+    --sombra:0 10px 26px rgba(11,37,69,.10);
+    --radio:14px;
+    --verde:#3C8C4A;
+    --amarillo:#D9A400;
+    --rojo:#C1543F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;
+    background:var(--blanco); color:var(--texto);
+    font-size:32px; line-height:1.5; overflow:hidden;
+  }
+
+  /* ---------- Barra lateral ---------- */
+  .sidebar{
+    position:fixed; top:0; left:0; bottom:0; width:320px;
+    background:var(--azul-oscuro); color:var(--blanco);
+    padding:28px 20px;
+    transform:translateX(-100%); transition:transform .3s ease;
+    z-index:60; display:flex; flex-direction:column; overflow-y:auto;
+  }
+  body.sidebar-open .sidebar{transform:translateX(0);}
+  .sidebar h2{font-size:22px; margin:0 0 18px; color:var(--dorado); font-weight:600; letter-spacing:.5px;}
+  .sidebar ol{list-style:none; margin:0; padding:0;}
+  .sidebar li{
+    font-size:18px; padding:9px 11px; border-radius:8px;
+    cursor:pointer; margin-bottom:4px; color:#C9D6E8; line-height:1.35;
+    transition:background .2s, color .2s;
+  }
+  .sidebar li:hover{background:rgba(231,200,115,.14); color:var(--blanco);}
+  .sidebar li.active{background:var(--azul-acento); color:var(--blanco); font-weight:600;}
+  .sidebar li.done::after{content:" ✓"; color:var(--dorado); font-weight:700;}
+
+  /* ---------- Botón flotante índice ---------- */
+  .toggle-sidebar{
+    position:fixed; bottom:22px; left:22px; z-index:65;
+    background:var(--azul-oscuro); color:var(--blanco);
+    border:none; border-radius:30px; padding:14px 22px;
+    font-size:20px; cursor:pointer; box-shadow:var(--sombra);
+    transition:background .2s, transform .15s;
+    display:flex; align-items:center; gap:10px;
+  }
+  .toggle-sidebar:hover{background:var(--azul-acento); transform:scale(1.04);}
+
+  /* ---------- Contador ---------- */
+  .counter{
+    position:fixed; bottom:86px; left:22px; z-index:65;
+    font-size:19px; color:var(--texto-suave); font-weight:700;
+    background:rgba(255,255,255,.92); padding:7px 16px; border-radius:20px;
+    box-shadow:0 4px 12px rgba(11,37,69,.08);
+  }
+
+  /* ---------- Escenario ---------- */
+  .stage{
+    position:absolute; inset:0;
+    display:flex; align-items:flex-start; justify-content:center;
+    padding:44px 64px 120px 64px;
+    transition:padding-left .3s ease;
+    overflow-y:auto;
+  }
+  body.sidebar-open .stage{padding-left:360px;}
+
+  .slide{
+    max-width:1400px; width:100%;
+    opacity:0; visibility:hidden;
+    position:absolute; left:64px; right:64px; top:44px;
+    transition:opacity .4s ease, transform .4s ease, visibility .4s;
+    transform:translateY(16px);
+  }
+  body.sidebar-open .slide{left:360px; right:64px;}
+  .slide.active{opacity:1; visibility:visible; transform:translateY(0);}
+
+  h1{font-size:62px; color:var(--azul-oscuro); margin:0 0 16px; line-height:1.12;}
+  h2{font-size:50px; color:var(--azul-oscuro); margin:0 0 26px; line-height:1.18;}
+  h3{font-size:32px; color:var(--azul-medio); margin:0 0 12px;}
+  p, li{font-size:31px; color:var(--texto);}
+  .lead{font-size:34px; color:var(--texto-suave);}
+  .subtitulo{font-size:36px; color:var(--azul-acento); font-weight:600; margin-bottom:10px;}
+
+  ul.clean{list-style:none; padding-left:0; margin:0;}
+  ul.clean li{padding-left:42px; position:relative; margin-bottom:12px;}
+  ul.clean li::before{
+    content:"›"; position:absolute; left:10px; top:-4px;
+    color:var(--dorado); font-size:38px; font-weight:700;
+  }
+
+  .card{
+    background:var(--gris-calido); border-left:6px solid var(--azul-acento);
+    border-radius:var(--radio); padding:22px 26px; margin:16px 0;
+    box-shadow:var(--sombra);
+  }
+  .card.dorado{border-left-color:var(--dorado); background:#FBF7EB;}
+  .card.azul{background:#EAF1F8; border-left-color:var(--azul-medio);}
+  .card.verde{background:#E4F3E6; border-left-color:var(--verde);}
+  .card.rojo{background:#FBE9E7; border-left-color:var(--rojo);}
+
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:26px;}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:22px;}
+
+  .pill{
+    display:inline-block; background:var(--azul-oscuro); color:var(--blanco);
+    border-radius:30px; padding:8px 22px; font-size:20px; font-weight:600;
+    letter-spacing:.4px; margin-bottom:16px;
+  }
+  .pill.dorado{background:var(--dorado); color:var(--azul-oscuro);}
+  .pill.verde{background:var(--verde); color:var(--blanco);}
+  .pill.rojo{background:var(--rojo); color:var(--blanco);}
+  .pill.amarillo{background:var(--amarillo); color:var(--blanco);}
+
+  /* ---------- Portada ---------- */
+  .portada{text-align:center; padding-top:60px;}
+  .portada h1{font-size:68px; margin-bottom:20px;}
+  .portada .linea{
+    width:140px; height:6px; background:var(--dorado);
+    margin:28px auto; border-radius:3px;
+  }
+  .portada .autor{font-size:36px; color:var(--azul-oscuro); font-weight:700; margin-top:14px;}
+  .portada .contexto{font-size:24px; color:var(--texto-suave); margin-top:8px;}
+
+  /* ---------- Opciones ---------- */
+  .opcion{
+    display:block; width:100%; text-align:left;
+    background:var(--blanco); border:3px solid var(--azul-medio);
+    border-radius:var(--radio); padding:18px 24px; margin:12px 0;
+    font-size:26px; color:var(--texto); cursor:pointer; line-height:1.4;
+    transition:background .2s, transform .15s;
+    font-family:inherit;
+  }
+  .opcion:hover:not(:disabled){background:#EAF1F8; transform:translateX(6px);}
+  .opcion:disabled{cursor:default;}
+  .opcion.correcta{background:#E4F3E6; border-color:var(--verde);}
+  .opcion.incorrecta{background:#FBE9E7; border-color:var(--rojo);}
+  .feedback{
+    margin-top:16px; padding:18px 22px; border-radius:var(--radio);
+    font-size:25px; display:none; line-height:1.45;
+  }
+  .feedback.ok{background:#E4F3E6; color:#1F5A2A; display:block;}
+  .feedback.no{background:#FBE9E7; color:#7A2E1C; display:block;}
+
+  /* ---------- Clasificación por clic ---------- */
+  .clasif-item{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:14px; background:var(--blanco); border:3px solid var(--azul-medio);
+    border-radius:12px; padding:16px 20px; margin:12px 0;
+    font-size:24px; line-height:1.4; flex-wrap:wrap;
+  }
+  .clasif-item .texto{flex:1; min-width:220px;}
+  .clasif-item .btns{display:flex; gap:10px;}
+  .clasif-btn{
+    border:2px solid var(--azul-medio); background:var(--blanco);
+    color:var(--azul-medio); border-radius:10px;
+    padding:10px 18px; font-size:20px; font-weight:700;
+    cursor:pointer; transition:background .2s, color .2s;
+    font-family:inherit;
+  }
+  .clasif-btn:hover{background:#EAF1F8;}
+  .clasif-btn.selected{background:var(--azul-medio); color:var(--blanco);}
+  .clasif-item.ok{border-color:var(--verde); background:#E4F3E6;}
+  .clasif-item.fail{border-color:var(--rojo); background:#FBE9E7;}
+
+  /* ---------- Emparejamiento ---------- */
+  .match-zona{display:grid; grid-template-columns:1fr 1fr; gap:26px;}
+  .match-col{display:flex; flex-direction:column; gap:12px;}
+  .match-card{
+    background:var(--blanco); border:3px solid var(--azul-medio);
+    border-radius:12px; padding:16px 20px; font-size:24px;
+    cursor:pointer; line-height:1.4; transition:background .2s;
+  }
+  .match-card:hover{background:#EAF1F8;}
+  .match-card.selected{background:var(--azul-medio); color:var(--blanco);}
+  .match-card.matched{background:#E4F3E6; border-color:var(--verde); cursor:default;}
+
+  /* ---------- Gráficos ---------- */
+  .graficos-layout{display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start;}
+  .grafico-card{
+    background:var(--blanco); border-radius:var(--radio);
+    box-shadow:var(--sombra); padding:18px;
+  }
+  .grafico-card h3{font-size:24px; margin:0 0 8px; color:var(--azul-medio);}
+  .grafico-card p{font-size:20px; margin:8px 0 0; color:var(--texto-suave); line-height:1.4;}
+  canvas{width:100%; height:auto; display:block; border-radius:8px;}
+
+  /* ---------- Simulación ---------- */
+  .sim-layout{display:grid; grid-template-columns:400px 1fr; gap:26px; align-items:start;}
+  .sim-controls{background:var(--gris-calido); border-radius:var(--radio); padding:24px; box-shadow:var(--sombra);}
+  .sim-controls label{display:block; font-size:22px; font-weight:600; color:var(--azul-medio); margin:14px 0 6px;}
+  .sim-controls select{
+    width:100%; padding:14px; font-size:22px; border-radius:10px;
+    border:2px solid var(--azul-medio); background:var(--blanco); color:var(--texto);
+    font-family:inherit;
+  }
+  .sim-canvas-wrap{background:var(--blanco); border-radius:var(--radio); box-shadow:var(--sombra); padding:20px;}
+
+  /* ---------- Autoevaluación ---------- */
+  .quiz-pregunta{
+    background:var(--blanco); border-radius:var(--radio);
+    box-shadow:var(--sombra); padding:24px 28px; margin-bottom:20px;
+  }
+  .quiz-pregunta .num{
+    display:inline-block; background:var(--azul-oscuro); color:var(--blanco);
+    border-radius:50%; width:40px; height:40px; line-height:40px;
+    text-align:center; font-weight:700; font-size:20px; margin-right:14px;
+  }
+  .quiz-pregunta p.enunciado{font-size:26px; margin:0 0 14px; font-weight:600; line-height:1.4;}
+  .quiz-pregunta .opcion{padding:14px 20px; font-size:22px; margin:10px 0;}
+
+  .resumen-quiz{
+    background:var(--gris-calido); border-radius:var(--radio);
+    padding:26px 30px; text-align:center; box-shadow:var(--sombra);
+    margin-top:20px;
+  }
+  .resumen-quiz .puntaje{
+    font-size:64px; font-weight:700; color:var(--azul-oscuro);
+    line-height:1;
+  }
+  .resumen-quiz .mensaje{font-size:24px; margin-top:14px; color:var(--texto-suave); line-height:1.4;}
+  .progress-quiz{
+    height:16px; background:#E4E9F0; border-radius:10px; margin:18px 0;
+    overflow:hidden;
+  }
+  .progress-quiz .bar{
+    height:100%; background:var(--dorado); width:0%;
+    transition:width .5s ease; border-radius:10px;
+  }
+
+  /* ---------- Navegación ---------- */
+  .nav-bottom{
+    position:fixed; bottom:22px; right:22px; z-index:65;
+    display:flex; align-items:center; gap:12px;
+  }
+  .nav-btn{
+    background:var(--azul-oscuro); color:var(--blanco); border:none;
+    border-radius:50%; width:56px; height:56px; font-size:28px;
+    cursor:pointer; box-shadow:var(--sombra);
+    transition:background .2s, transform .15s;
+  }
+  .nav-btn:hover{background:var(--azul-acento); transform:scale(1.06);}
+  .nav-btn:disabled{opacity:.35; cursor:default; transform:none;}
+  .progress{
+    position:fixed; bottom:0; left:0; height:5px;
+    background:var(--dorado); width:0%; transition:width .3s ease; z-index:70;
+  }
+
+  @media (max-width:1100px){
+    body{font-size:22px;}
+    h1{font-size:38px;} h2{font-size:32px;} h3{font-size:24px;}
+    p, li{font-size:21px;} .lead{font-size:22px;}
+    .portada h1{font-size:40px;}
+    .portada .autor{font-size:24px;}
+    .portada .contexto{font-size:18px;}
+    .pill{font-size:16px; padding:6px 16px;}
+    .grid-2, .grid-3, .sim-layout, .match-zona, .graficos-layout{grid-template-columns:1fr;}
+    .stage{padding:32px 22px 110px 22px;}
+    body.sidebar-open .stage{padding-left:22px;}
+    .slide{left:22px; right:22px; top:32px;}
+    body.sidebar-open .slide{left:22px; right:22px;}
+    .sidebar{width:280px;}
+    .opcion{font-size:20px; padding:14px 18px;}
+    .clasif-item{font-size:20px;}
+    .clasif-btn{font-size:17px; padding:8px 14px;}
+    .quiz-pregunta p.enunciado{font-size:21px;}
+    .quiz-pregunta .opcion{font-size:19px;}
+    .resumen-quiz .puntaje{font-size:48px;}
+  }
+</style>
+</head>
+<body>
+
+<button class="toggle-sidebar" id="toggleSidebar" aria-label="Mostrar u ocultar índice">☰ Índice</button>
+<div class="counter" id="counter">1 / 24</div>
+
+<nav class="sidebar" id="sidebar">
+  <h2>CONTENIDO</h2>
+  <ol id="indice"></ol>
+</nav>
+
+<main class="stage" id="stage">
+
+  <!-- ===== 1. PORTADA ===== -->
+  <section class="slide portada" data-title="Portada">
+    <span class="pill dorado">Artefacto interactivo · Introducción a la Investigación</span>
+    <h1>Investigación cuantitativa y cualitativa</h1>
+    <div class="linea"></div>
+    <p class="subtitulo">Comprender, comparar y aplicar los dos enfoques</p>
+    <p class="autor">Juan Carlos Valderrama Cárdenas</p>
+    <p class="contexto">Con evaluación formativa y autoevaluación integradas</p>
+  </section>
+
+  <!-- ===== 2. AGENDA ===== -->
+  <section class="slide" data-title="Agenda">
+    <span class="pill">Agenda</span>
+    <h2>¿Qué recorrerás hoy?</h2>
+    <div class="grid-2">
+      <ul class="clean">
+        <li>Por qué la pregunta orienta el método</li>
+        <li>Qué es la investigación cuantitativa (con gráficas)</li>
+        <li>Qué es la investigación cualitativa</li>
+        <li>Comparación crítica, sin caricaturas</li>
+      </ul>
+      <ul class="clean">
+        <li>Dos simulaciones: matriz de decisión y codificación temática</li>
+        <li>Actividades formativas de clasificación y emparejamiento</li>
+        <li>Autoevaluación final con puntaje y recomendaciones</li>
+        <li>Referencias clave (APA 7)</li>
+      </ul>
+    </div>
+    <div class="card dorado">
+      <strong>Evaluación formativa a lo largo del recorrido.</strong> Cada actividad da retroalimentación inmediata. Al final, una autoevaluación con puntaje.
+    </div>
+  </section>
+
+  <!-- ===== 3. IDEA CENTRAL ===== -->
+  <section class="slide" data-title="Idea central">
+    <span class="pill">Idea central</span>
+    <h2>La pregunta orienta el método</h2>
+    <div class="card azul">
+      <p><strong>¿Qué necesito conocer para responder mi pregunta de investigación?</strong></p>
+    </div>
+    <p class="lead">No elegimos primero “soy cuantitativo” o “soy cualitativo”. Partimos del problema y de lo que necesitamos conocer.</p>
+    <div class="grid-3">
+      <div class="card"><h3>¿Cuánto?</h3><p>Magnitud, frecuencia, relación, efecto.</p></div>
+      <div class="card"><h3>¿Cómo?</h3><p>Experiencia, significado, proceso, contexto.</p></div>
+      <div class="card"><h3>¿Ambos?</h3><p>Medir y comprender en un mismo estudio.</p></div>
+    </div>
+  </section>
+
+  <!-- ===== 4. ACTIVIDAD FORMATIVA 1 ===== -->
+  <section class="slide" data-title="Actividad 1">
+    <span class="pill">Actividad formativa 1</span>
+    <h2>¿Qué tipo de pregunta es esta?</h2>
+    <p class="lead">Pregunta: <em>“¿Qué relación existe entre horas de sueño y rendimiento en tareas de atención sostenida en estudiantes universitarios?”</em></p>
+    <div id="quiz1">
+      <button class="opcion" data-correct="true">Cuantitativa: busca medir una relación entre variables.</button>
+      <button class="opcion" data-correct="false">Cualitativa: busca comprender experiencias.</button>
+      <button class="opcion" data-correct="false">No es ni cuantitativa ni cualitativa.</button>
+    </div>
+    <div class="feedback" id="fb1"></div>
+  </section>
+
+  <!-- ===== 5. ¿QUÉ ES LA INVESTIGACIÓN CUANTITATIVA? ===== -->
+  <section class="slide" data-title="Cuantitativa">
+    <span class="pill">Enfoque cuantitativo</span>
+    <h2>¿Qué es la investigación cuantitativa?</h2>
+    <p class="lead">Busca medir variables y analizar sus relaciones con datos numéricos.</p>
+    <div class="grid-2">
+      <div class="card azul">
+        <h3>Qué busca</h3>
+        <ul class="clean">
+          <li>Magnitud, frecuencia, relación, diferencia</li>
+          <li>Efecto de una variable sobre otra</li>
+          <li>Predicción a partir de variables medidas</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Cómo lo hace</h3>
+        <ul class="clean">
+          <li>Operacionaliza variables</li>
+          <li>Usa instrumentos con validez y confiabilidad</li>
+          <li>Recoge datos numéricos de una muestra</li>
+          <li>Analiza con estadística descriptiva e inferencial</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 6. GRÁFICAS CUANTITATIVAS ===== -->
+  <section class="slide" data-title="Gráficas cuantitativas">
+    <span class="pill dorado">Ejemplo visual</span>
+    <h2>Tres gráficos para entender datos cuantitativos</h2>
+    <p class="lead">Los datos numéricos se organizan en gráficos que permiten ver patrones, relaciones y comparaciones.</p>
+
+    <div class="graficos-layout">
+      <div class="grafico-card">
+        <h3>Histograma — distribución del estrés académico</h3>
+        <canvas id="grafHist" width="480" height="300"></canvas>
+        <p>Muestra cómo se distribuyen los puntajes de estrés en la muestra. Se aprecia una concentración alrededor de la media.</p>
+      </div>
+      <div class="grafico-card">
+        <h3>Dispersión — estrés y calidad del sueño</h3>
+        <canvas id="grafDisp" width="480" height="300"></canvas>
+        <p>Cada punto es un participante. La línea de tendencia descendente sugiere una correlación negativa: a mayor estrés, menor calidad del sueño.</p>
+      </div>
+      <div class="grafico-card">
+        <h3>Barras — comparación entre grupos</h3>
+        <canvas id="grafBarras" width="480" height="300"></canvas>
+        <p>Compara el nivel de estrés entre dos grupos: quienes practican mindfulness y quienes no. La diferencia entre barras refleja el efecto observado.</p>
+      </div>
+      <div class="card dorado">
+        <h3>Lo que estos gráficos permiten concluir</h3>
+        <p>Cada gráfico responde a una pregunta distinta: distribución, relación o comparación. Ninguno por sí solo demuestra causalidad, pero juntos orientan la interpretación estadística.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 7. ACTIVIDAD FORMATIVA 2 ===== -->
+  <section class="slide" data-title="Actividad 2">
+    <span class="pill">Actividad formativa 2</span>
+    <h2>Identifica la variable dependiente</h2>
+    <p class="lead">En el estudio “una intervención breve de mindfulness reduce el estrés académico”, ¿cuál es la variable dependiente?</p>
+    <div id="quiz2">
+      <button class="opcion" data-correct="false">La intervención de mindfulness.</button>
+      <button class="opcion" data-correct="true">El nivel de estrés académico medido después.</button>
+      <button class="opcion" data-correct="false">Los estudiantes participantes.</button>
+    </div>
+    <div class="feedback" id="fb2"></div>
+  </section>
+
+  <!-- ===== 8. ¿QUÉ ES LA INVESTIGACIÓN CUALITATIVA? ===== -->
+  <section class="slide" data-title="Cualitativa">
+    <span class="pill">Enfoque cualitativo</span>
+    <h2>¿Qué es la investigación cualitativa?</h2>
+    <p class="lead">Busca comprender cómo las personas viven, significan y describen un fenómeno.</p>
+    <div class="grid-2">
+      <div class="card dorado">
+        <h3>Qué busca</h3>
+        <ul class="clean">
+          <li>Experiencia, significado, proceso, contexto</li>
+          <li>Perspectivas de los participantes</li>
+          <li>Comprensión profunda de un fenómeno</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Cómo lo hace</h3>
+        <ul class="clean">
+          <li>Produce datos descriptivos: entrevistas, observaciones, documentos</li>
+          <li>Analiza con codificación, categorías y temas</li>
+          <li>Reconoce el papel reflexivo del investigador</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 9. EJEMPLO CUALITATIVO ===== -->
+  <section class="slide" data-title="Ejemplo cualitativo">
+    <span class="pill">Ejemplo</span>
+    <h2>Un estudio cualitativo típico</h2>
+    <div class="card dorado">
+      <p><strong>Pregunta:</strong> ¿cómo describen los estudiantes de primer semestre su experiencia de ansiedad antes de los exámenes?</p>
+      <p><strong>Participantes:</strong> 12 estudiantes seleccionados por muestreo intencional.</p>
+      <p><strong>Producción de datos:</strong> entrevistas semiestructuradas de 45–60 minutos.</p>
+      <p><strong>Análisis:</strong> análisis temático reflexivo (Braun y Clarke).</p>
+    </div>
+    <p class="lead">El resultado es un conjunto de temas: por ejemplo, <em>“el cuerpo como señal de alerta”</em>, <em>“comparación con los pares”</em>, <em>“el silencio que no se comparte”</em>.</p>
+  </section>
+
+  <!-- ===== 10. ACTIVIDAD FORMATIVA 3 ===== -->
+  <section class="slide" data-title="Actividad 3">
+    <span class="pill">Actividad formativa 3</span>
+    <h2>¿Qué tipo de dato produce esta pregunta?</h2>
+    <p class="lead">Pregunta: <em>“¿Cómo describen las madres primerizas su experiencia de sueño durante los primeros seis meses del bebé?”</em></p>
+    <div id="quiz3">
+      <button class="opcion" data-correct="false">Datos numéricos: horas de sueño y número de despertares.</button>
+      <button class="opcion" data-correct="true">Datos textuales: descripciones, significados y experiencias narradas.</button>
+      <button class="opcion" data-correct="false">Datos fisiológicos: polisomnografía nocturna.</button>
+    </div>
+    <div class="feedback" id="fb3"></div>
+  </section>
+
+  <!-- ===== 11. LAS CUATRO PREGUNTAS ===== -->
+  <section class="slide" data-title="Cuatro preguntas">
+    <span class="pill">Marco comparativo</span>
+    <h2>Cuatro preguntas para decidir</h2>
+    <div class="grid-2">
+      <div class="card azul">
+        <h3>1. ¿Qué quiero conocer?</h3>
+        <p>Magnitud, relación, efecto → cuantitativo.</p>
+        <p>Experiencia, significado, proceso → cualitativo.</p>
+      </div>
+      <div class="card azul">
+        <h3>2. ¿Qué tipo de datos necesito?</h3>
+        <p>Numéricos (escalas, tiempos, frecuencias).</p>
+        <p>Textuales (entrevistas, observaciones, documentos).</p>
+      </div>
+      <div class="card azul">
+        <h3>3. ¿Cómo voy a analizarlos?</h3>
+        <p>Estadística descriptiva e inferencial.</p>
+        <p>Codificación, categorías, temas.</p>
+      </div>
+      <div class="card dorado">
+        <h3>4. ¿Qué tipo de afirmación puedo hacer?</h3>
+        <p>La pregunta clave es: <strong>¿qué permite concluir realmente este método?</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 12. SIMULACIÓN 1: MATRIZ DE DECISIÓN ===== -->
+  <section class="slide" data-title="Matriz de decisión">
+    <span class="pill dorado">Simulación 1</span>
+    <h2>La matriz de decisión metodológica</h2>
+    <p class="lead">Responde tres preguntas encadenadas y observa qué enfoque emerge.</p>
+
+    <div class="sim-layout">
+      <div class="sim-controls">
+        <label>1. ¿Qué quieres conocer?</label>
+        <select id="m1">
+          <option value="">— Selecciona —</option>
+          <option value="cuanti">Magnitud, relación, diferencia o efecto</option>
+          <option value="cuali">Experiencia, significado, proceso o contexto</option>
+          <option value="mixto">Necesito ambas dimensiones</option>
+        </select>
+
+        <label>2. ¿Qué tipo de datos necesitas?</label>
+        <select id="m2">
+          <option value="">— Selecciona —</option>
+          <option value="cuanti">Numéricos</option>
+          <option value="cuali">Textuales</option>
+          <option value="mixto">Ambos</option>
+        </select>
+
+        <label>3. ¿Qué tipo de afirmación quieres poder hacer?</label>
+        <select id="m3">
+          <option value="">— Selecciona —</option>
+          <option value="cuanti">Medir, comparar o predecir</option>
+          <option value="cuali">Comprender, describir o interpretar</option>
+          <option value="mixto">Medir y comprender al mismo tiempo</option>
+        </select>
+      </div>
+
+      <div class="sim-canvas-wrap" id="matrizResultado">
+        <!-- Se llena con JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 13. ACTIVIDAD FORMATIVA 4 ===== -->
+  <section class="slide" data-title="Actividad 4">
+    <span class="pill">Actividad formativa 4</span>
+    <h2>¿Cuál enfoque corresponde a cada afirmación?</h2>
+    <p class="lead">Marca la casilla correcta en cada caso. Recibirás retroalimentación inmediata.</p>
+
+    <div id="clasifContenedor">
+      <div class="clasif-item" data-correcto="cuanti">
+        <span class="texto">“Existe una relación estadísticamente significativa entre X e Y.”</span>
+        <div class="btns">
+          <button class="clasif-btn" data-valor="cuanti">Cuantitativa</button>
+          <button class="clasif-btn" data-valor="cuali">Cualitativa</button>
+        </div>
+      </div>
+      <div class="clasif-item" data-correcto="cuali">
+        <span class="texto">“Emergen tres temas que organizan cómo se vive el fenómeno.”</span>
+        <div class="btns">
+          <button class="clasif-btn" data-valor="cuanti">Cuantitativa</button>
+          <button class="clasif-btn" data-valor="cuali">Cualitativa</button>
+        </div>
+      </div>
+      <div class="clasif-item" data-correcto="cuanti">
+        <span class="texto">“El grupo experimental obtuvo puntajes promedio más altos que el control.”</span>
+        <div class="btns">
+          <button class="clasif-btn" data-valor="cuanti">Cuantitativa</button>
+          <button class="clasif-btn" data-valor="cuali">Cualitativa</button>
+        </div>
+      </div>
+      <div class="clasif-item" data-correcto="cuali">
+        <span class="texto">“Los participantes describen el proceso como una secuencia de tres momentos.”</span>
+        <div class="btns">
+          <button class="clasif-btn" data-valor="cuanti">Cuantitativa</button>
+          <button class="clasif-btn" data-valor="cuali">Cualitativa</button>
+        </div>
+      </div>
+    </div>
+    <div class="feedback" id="fb4"></div>
+  </section>
+
+  <!-- ===== 14. MÉTODOS CUANTITATIVOS ===== -->
+  <section class="slide" data-title="Métodos cuantitativos">
+    <span class="pill">Cuantitativo</span>
+    <h2>Métodos cuantitativos frecuentes en Psicología</h2>
+    <div class="grid-2">
+      <ul class="clean">
+        <li><strong>Descriptivo:</strong> describe frecuencias y medias.</li>
+        <li><strong>Correlacional:</strong> examina relaciones entre variables.</li>
+        <li><strong>Cuasi-experimental:</strong> compara grupos sin aleatorización.</li>
+      </ul>
+      <ul class="clean">
+        <li><strong>Experimental:</strong> manipula la VI con asignación aleatoria.</li>
+        <li><strong>Longitudinal:</strong> mide en varios momentos.</li>
+        <li><strong>Psicométrico:</strong> valida instrumentos de medición.</li>
+      </ul>
+    </div>
+    <div class="card dorado">
+      La elección depende del tipo de pregunta y de las condiciones éticas y prácticas para obtener los datos.
+    </div>
+  </section>
+
+  <!-- ===== 15. DISEÑOS CUALITATIVOS ===== -->
+  <section class="slide" data-title="Diseños cualitativos">
+    <span class="pill">Cualitativo</span>
+    <h2>Diseños cualitativos frecuentes</h2>
+    <div class="grid-3">
+      <div class="card"><h3>Fenomenología</h3><p>Esencia de una experiencia vivida.</p></div>
+      <div class="card"><h3>Narrativa</h3><p>Historias y relatos de las personas.</p></div>
+      <div class="card"><h3>Teoría fundamentada</h3><p>Generar teoría a partir de los datos.</p></div>
+      <div class="card"><h3>Etnografía</h3><p>Cultura y prácticas de una comunidad.</p></div>
+      <div class="card"><h3>Estudio de caso</h3><p>Análisis en profundidad de un caso delimitado.</p></div>
+      <div class="card dorado"><h3>Análisis temático</h3><p>Identificar patrones temáticos en los datos.</p></div>
+    </div>
+  </section>
+
+  <!-- ===== 16. ACTIVIDAD FORMATIVA 5: EMPAREJAMIENTO ===== -->
+  <section class="slide" data-title="Actividad 5">
+    <span class="pill">Actividad formativa 5</span>
+    <h2>Empareja cada diseño con su propósito</h2>
+    <p class="lead">Haz clic en una tarjeta de la izquierda y luego en la que corresponde a la derecha.</p>
+
+    <div class="match-zona">
+      <div class="match-col" id="matchLeft">
+        <div class="match-card" data-id="fenomenologia">Fenomenología</div>
+        <div class="match-card" data-id="narrativa">Investigación narrativa</div>
+        <div class="match-card" data-id="etnografia">Etnografía</div>
+        <div class="match-card" data-id="caso">Estudio de caso</div>
+      </div>
+      <div class="match-col" id="matchRight">
+        <div class="match-card" data-match="caso">Analizar en profundidad un caso delimitado.</div>
+        <div class="match-card" data-match="fenomenologia">Comprender la esencia de una experiencia vivida.</div>
+        <div class="match-card" data-match="etnografia">Comprender una cultura o comunidad desde dentro.</div>
+        <div class="match-card" data-match="narrativa">Estudiar cómo las personas construyen y cuentan sus historias.</div>
+      </div>
+    </div>
+    <div class="feedback" id="fb5"></div>
+  </section>
+
+  <!-- ===== 17. SIMULACIÓN 2: ANÁLISIS TEMÁTICO ===== -->
+  <section class="slide" data-title="Análisis temático">
+    <span class="pill dorado">Simulación 2</span>
+    <h2>Análisis temático: codifica fragmentos</h2>
+    <p class="lead">Lee tres fragmentos de entrevista y asígnales el código que mejor los describa. Observa cómo los códigos se agrupan en un tema.</p>
+
+    <div class="grid-2">
+      <div class="card azul">
+        <h3>Fragmento 1</h3>
+        <p><em>“Antes del examen siento que el corazón me va a mil. No puedo pensar con claridad.”</em></p>
+        <div class="clasif-item" data-correcto="cuerpo" style="margin-top:12px;">
+          <span class="texto">Código:</span>
+          <div class="btns">
+            <button class="clasif-btn" data-valor="cuerpo">Señales corporales</button>
+            <button class="clasif-btn" data-valor="comparacion">Comparación social</button>
+          </div>
+        </div>
+      </div>
+      <div class="card azul">
+        <h3>Fragmento 2</h3>
+        <p><em>“Siento que todos están mejor preparados que yo. Eso me agobia.”</em></p>
+        <div class="clasif-item" data-correcto="comparacion" style="margin-top:12px;">
+          <span class="texto">Código:</span>
+          <div class="btns">
+            <button class="clasif-btn" data-valor="cuerpo">Señales corporales</button>
+            <button class="clasif-btn" data-valor="comparacion">Comparación social</button>
+          </div>
+        </div>
+      </div>
+      <div class="card azul">
+        <h3>Fragmento 3</h3>
+        <p><em>“No hablo de esto con nadie. Siento que si lo digo me verán débil.”</em></p>
+        <div class="clasif-item" data-correcto="silencio" style="margin-top:12px;">
+          <span class="texto">Código:</span>
+          <div class="btns">
+            <button class="clasif-btn" data-valor="silencio">Silencio y estigma</button>
+            <button class="clasif-btn" data-valor="comparacion">Comparación social</button>
+          </div>
+        </div>
+      </div>
+      <div class="card dorado">
+        <h3>Tema emergente</h3>
+        <p>Una vez codificados, los fragmentos pueden agruparse en un tema como:</p>
+        <p><strong>“La ansiedad ante los exámenes se vive en el cuerpo, se compara con los pares y se calla por miedo al juicio.”</strong></p>
+      </div>
+    </div>
+    <div class="feedback" id="fb6"></div>
+  </section>
+
+  <!-- ===== 18. DIFERENCIAS SIN CARICATURAS ===== -->
+  <section class="slide" data-title="Diferencias">
+    <span class="pill">Comparación crítica</span>
+    <h2>Diferencias sin caricaturas</h2>
+    <div class="grid-2">
+      <div class="card azul">
+        <h3>Cuantitativo</h3>
+        <ul class="clean">
+          <li>Trabaja con variables operacionalizadas</li>
+          <li>Busca relaciones, diferencias o efectos</li>
+          <li>Usa muestras representativas y análisis estadístico</li>
+          <li>Sus afirmaciones suelen ser probabilísticas</li>
+        </ul>
+      </div>
+      <div class="card dorado">
+        <h3>Cualitativo</h3>
+        <ul class="clean">
+          <li>Trabaja con experiencias y significados</li>
+          <li>Busca comprender procesos y contextos</li>
+          <li>Usa muestras intencionales y análisis interpretativo</li>
+          <li>Sus afirmaciones describen y explican en profundidad</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <p><strong>Ninguno es superior.</strong> Cada uno responde a preguntas distintas. Los métodos mixtos integran ambos cuando el problema lo exige.</p>
+    </div>
+  </section>
+
+  <!-- ===== 19. ACTIVIDAD FORMATIVA 6 ===== -->
+  <section class="slide" data-title="Actividad 6">
+    <span class="pill">Actividad formativa 6</span>
+    <h2>Verdadero o falso</h2>
+    <p class="lead">“La investigación cualitativa es menos rigurosa que la cuantitativa porque no usa estadística.”</p>
+    <div id="quiz4">
+      <button class="opcion" data-correct="false">Verdadero.</button>
+      <button class="opcion" data-correct="true">Falso: el rigor cualitativo se sostiene en la transparencia metodológica, la coherencia analítica y la reflexividad, no en el uso de estadística.</button>
+    </div>
+    <div class="feedback" id="fb7"></div>
+  </section>
+
+  <!-- ===== 20. CUÁNDO USAR CADA ENFOQUE ===== -->
+  <section class="slide" data-title="Cuándo usar">
+    <span class="pill">Aplicación</span>
+    <h2>¿Cuándo conviene cada enfoque?</h2>
+    <div class="grid-3">
+      <div class="card azul">
+        <h3>Cuantitativo</h3>
+        <p>Cuando quieres medir, comparar, relacionar o predecir. Cuando hay variables claras y muestra suficiente.</p>
+      </div>
+      <div class="card dorado">
+        <h3>Cualitativo</h3>
+        <p>Cuando quieres comprender un fenómeno poco explorado, procesos, significados o contextos específicos.</p>
+      </div>
+      <div class="card verde">
+        <h3>Mixto</h3>
+        <p>Cuando medir y comprender se necesitan mutuamente. Requiere planear <em>cómo</em> y <em>dónde</em> se integran los componentes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 21. AUTOEVALUACIÓN FINAL ===== -->
+  <section class="slide" data-title="Autoevaluación">
+    <span class="pill rojo">Autoevaluación final</span>
+    <h2>Pon a prueba lo aprendido</h2>
+    <p class="lead">Ocho preguntas. Recibirás puntaje y recomendaciones al final.</p>
+
+    <div id="autoeval"></div>
+
+    <div class="resumen-quiz" id="resumenQuiz" style="display:none;">
+      <p class="puntaje" id="puntajeFinal">0 / 8</p>
+      <div class="progress-quiz"><div class="bar" id="barQuiz"></div></div>
+      <p class="mensaje" id="mensajeQuiz"></p>
+      <button class="opcion" style="max-width:420px; margin:20px auto 0; text-align:center;" id="btnReiniciarQuiz">Reintentar autoevaluación</button>
+    </div>
+  </section>
+
+  <!-- ===== 22. SÍNTESIS ===== -->
+  <section class="slide" data-title="Síntesis">
+    <span class="pill">Cierre</span>
+    <h2>Lo esencial que te llevas</h2>
+    <div class="card dorado" style="text-align:center; font-size:30px; line-height:1.5;">
+      <strong>Pregunta → tipo de información → datos → diseño → método → análisis → inferencia</strong>
+    </div>
+    <ul class="clean">
+      <li>El método se elige por correspondencia con la pregunta, no por preferencia personal.</li>
+      <li>Cada enfoque tiene su propio rigor: no hay métodos “mejores” en abstracto.</li>
+      <li>La evaluación formativa durante el recorrido te prepara para decidir mejor.</li>
+    </ul>
+  </section>
+
+  <!-- ===== 23. RECOMENDACIONES PERSONALIZADAS ===== -->
+  <section class="slide" data-title="Recomendaciones">
+    <span class="pill">Según tu autoevaluación</span>
+    <h2>Recomendaciones para seguir aprendiendo</h2>
+    <div class="grid-2">
+      <div class="card azul">
+        <h3>Si acertaste casi todo</h3>
+        <p>Estás listo para leer críticamente artículos de ambos enfoques. Intenta comparar dos artículos sobre el mismo tema publicados con métodos distintos.</p>
+      </div>
+      <div class="card dorado">
+        <h3>Si acertaste la mitad</h3>
+        <p>Repasa la diferencia entre datos numéricos y textuales, y el tipo de afirmación que permite cada enfoque. Practica clasificando resúmenes de artículos.</p>
+      </div>
+      <div class="card rojo">
+        <h3>Si acertaste menos de la mitad</h3>
+        <p>Vuelve a las diapositivas 5 a 10 y a las dos simulaciones. La clave es entender que la pregunta orienta el método, y que el rigor no depende del enfoque sino de la coherencia metodológica.</p>
+      </div>
+      <div class="card verde">
+        <h3>Siguiente paso</h3>
+        <p>Busca un artículo cuantitativo y otro cualitativo sobre el mismo tema (por ejemplo, estrés académico) y compara cómo formulan su pregunta, qué datos usan y qué tipo de conclusiones obtienen.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 24. REFERENCIAS ===== -->
+  <section class="slide" data-title="Referencias">
+    <span class="pill">Referencias</span>
+    <h2>Fuentes base (APA 7)</h2>
+    <div class="card azul">
+      <p style="font-size:20px; line-height:1.5;">
+        American Psychological Association. (2023). <em>APA handbook of research methods in psychology</em> (2nd ed.). APA.<br><br>
+        Braun, V., &amp; Clarke, V. (2021). Can I use TA? Should I use TA? Should I not use TA? <em>Counselling and Psychotherapy Research, 21</em>(1), 37–47.<br><br>
+        Creswell, J. W., &amp; Creswell, J. D. (2018). <em>Research design: Qualitative, quantitative, and mixed methods approaches</em> (5th ed.). SAGE.<br><br>
+        Creswell, J. W., &amp; Plano Clark, V. L. (2018). <em>Designing and conducting mixed methods research</em> (3rd ed.). SAGE.<br><br>
+        Creswell, J. W., &amp; Poth, C. N. (2018). <em>Qualitative inquiry and research design: Choosing among five approaches</em> (5th ed.). SAGE.<br><br>
+        Fetters, M. D., Curry, L. A., &amp; Creswell, J. W. (2013). Achieving integration in mixed methods designs. <em>Health Services Research, 48</em>(6 Pt. 2), 2134–2156.<br><br>
+        Levitt, H. M., et al. (2018). Journal article reporting standards for qualitative primary, qualitative meta-analytic, and mixed methods research in psychology. <em>American Psychologist, 73</em>(1), 26–46.<br><br>
+        Yin, R. K. (2018). <em>Case study research and applications: Design and methods</em> (6th ed.). SAGE.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<div class="nav-bottom">
+  <button class="nav-btn" id="prevBtn" aria-label="Anterior">‹</button>
+  <button class="nav-btn" id="nextBtn" aria-label="Siguiente">›</button>
+</div>
+<div class="progress" id="progress"></div>
+
+<script>
+/* ============================================================
+   1. NAVEGACIÓN
+   ============================================================ */
+const slides = Array.from(document.querySelectorAll('.slide'));
+const indiceEl = document.getElementById('indice');
+const progress = document.getElementById('progress');
+const counter = document.getElementById('counter');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+let current = 0;
+const visitadas = new Set();
+
+slides.forEach((s, i) => {
+  const li = document.createElement('li');
+  li.textContent = (i + 1) + '. ' + s.dataset.title;
+  li.addEventListener('click', () => {
+    goTo(i);
+    if (window.innerWidth < 1100 && document.body.classList.contains('sidebar-open')) {
+      document.body.classList.remove('sidebar-open');
+    }
+  });
+  indiceEl.appendChild(li);
+});
+const indexItems = Array.from(indiceEl.children);
+
+function goTo(i){
+  if (i < 0 || i >= slides.length) return;
+  slides[current].classList.remove('active');
+  indexItems[current].classList.remove('active');
+  current = i;
+  visitadas.add(i);
+  slides[current].classList.add('active');
+  indexItems[current].classList.add('active');
+  visitadas.forEach(j => indexItems[j].classList.add('done'));
+  document.getElementById('stage').scrollTop = 0;
+  updateUI();
+}
+function updateUI(){
+  progress.style.width = ((current + 1) / slides.length * 100) + '%';
+  counter.textContent = (current + 1) + ' / ' + slides.length;
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = current === slides.length - 1;
+}
+prevBtn.addEventListener('click', () => goTo(current - 1));
+nextBtn.addEventListener('click', () => goTo(current + 1));
+slides[0].classList.add('active');
+indexItems[0].classList.add('active');
+visitadas.add(0);
+indexItems[0].classList.add('done');
+updateUI();
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1); }
+  if (e.key === 'Home') goTo(0);
+  if (e.key === 'End') goTo(slides.length - 1);
+});
+
+document.getElementById('toggleSidebar').addEventListener('click', () => {
+  document.body.classList.toggle('sidebar-open');
+});
+
+/* ============================================================
+   2. QUIZZES FORMATIVOS DE OPCIÓN MÚLTIPLE
+   ============================================================ */
+function setupQuiz(quizId, feedbackId, okMsg, noMsg){
+  const quiz = document.getElementById(quizId);
+  const fb = document.getElementById(feedbackId);
+  if (!quiz || !fb) return;
+  quiz.querySelectorAll('.opcion').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (quiz.dataset.answered === 'true') return;
+      quiz.dataset.answered = 'true';
+      const correct = btn.dataset.correct === 'true';
+      quiz.querySelectorAll('.opcion').forEach(b => {
+        b.disabled = true;
+        if (b.dataset.correct === 'true') b.classList.add('correcta');
+      });
+      if (!correct) btn.classList.add('incorrecta');
+      fb.classList.add(correct ? 'ok' : 'no');
+      fb.classList.remove(correct ? 'no' : 'ok');
+      fb.innerHTML = correct ? okMsg : noMsg;
+    });
+  });
+}
+setupQuiz('quiz1','fb1',
+  '✔ Correcto. La pregunta pide medir la relación entre dos variables: eso es cuantitativo.',
+  '✘ Cuidado. La pregunta no busca comprender experiencias ni significados. Pide medir una relación entre variables. Es cuantitativa.'
+);
+setupQuiz('quiz2','fb2',
+  '✔ Correcto. La variable dependiente es el estrés académico: es la que se espera que cambie con la intervención.',
+  '✘ Cuidado. La intervención de mindfulness es la variable independiente (lo que se manipula). La dependiente es el estrés académico medido después.'
+);
+setupQuiz('quiz3','fb3',
+  '✔ Correcto. La pregunta pide descripciones y significados: eso produce datos textuales.',
+  '✘ Cuidado. La pregunta pide <em>cómo describen</em>, no <em>cuántas horas</em>. Eso produce datos textuales.'
+);
+setupQuiz('quiz4','fb7',
+  '✔ Correcto. El rigor cualitativo se sostiene en la transparencia, la coherencia y la reflexividad, no en el uso de estadística.',
+  '✘ Cuidado. La ausencia de estadística no equivale a falta de rigor. El rigor depende de la coherencia metodológica y la transparencia.'
+);
+
+/* ============================================================
+   3. ACTIVIDADES DE CLASIFICACIÓN POR BOTONES
+   Cada instancia de clasif-item se maneja de forma independiente
+   y notifica al contenedor. El feedback aparece cuando TODOS los
+   items del contenedor han sido respondidos.
+   ============================================================ */
+function setupClasificacion(contenedorId, feedbackId, mensajesExito, mensajesFallo){
+  const cont = document.getElementById(contenedorId);
+  if (!cont) return;
+  const items = cont.querySelectorAll('.clasif-item');
+  const fb = document.getElementById(feedbackId);
+  if (!items.length) return;
+  let respondidos = 0;
+  let aciertos = 0;
+
+  items.forEach(item => {
+    item.querySelectorAll('.clasif-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (item.dataset.answered === 'true') return;
+        item.dataset.answered = 'true';
+        const correcto = item.dataset.correcto === btn.dataset.valor;
+        item.querySelectorAll('.clasif-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.classList.add(correcto ? 'ok' : 'fail');
+        respondidos++;
+        if (correcto) aciertos++;
+        if (fb && respondidos === items.length){
+          const perfecto = aciertos === items.length;
+          fb.classList.add(perfecto ? 'ok' : 'no');
+          fb.classList.remove(perfecto ? 'no' : 'ok');
+          fb.innerHTML = `Has acertado ${aciertos} de ${items.length}. ` +
+            (perfecto ? (mensajesExito || '¡Excelente!') : (mensajesFallo || 'Revisa los casos marcados en rojo.'));
+        }
+      });
+    });
+  });
+}
+
+setupClasificacion('clasifContenedor','fb4',
+  '¡Excelente! Reconoces con precisión las características de cada enfoque.',
+  'Revisa los casos marcados en rojo: cada uno corresponde al otro enfoque.'
+);
+
+/* El análisis temático tiene su propio contenedor.
+   Los tres fragmentos están dentro de la diapositiva "Análisis temático",
+   pero NO comparten un contenedor con id. Los envolvemos dinámicamente. */
+(function(){
+  const slide = document.querySelector('.slide[data-title="Análisis temático"]');
+  if (!slide) return;
+  const items = slide.querySelectorAll('.clasif-item');
+  const fb = document.getElementById('fb6');
+  let respondidos = 0, aciertos = 0;
+  items.forEach(item => {
+    item.querySelectorAll('.clasif-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (item.dataset.answered === 'true') return;
+        item.dataset.answered = 'true';
+        const correcto = item.dataset.correcto === btn.dataset.valor;
+        item.querySelectorAll('.clasif-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.classList.add(correcto ? 'ok' : 'fail');
+        respondidos++; if (correcto) aciertos++;
+        if (respondidos === items.length){
+          const perfecto = aciertos === items.length;
+          fb.classList.add(perfecto ? 'ok' : 'no');
+          fb.classList.remove(perfecto ? 'no' : 'ok');
+          fb.innerHTML = `Has codificado correctamente ${aciertos} de ${items.length}. ` +
+            (perfecto
+              ? 'Con esos códigos, el tema emergente podría formularse así: “La ansiedad ante los exámenes se vive en el cuerpo, se compara con los pares y se calla por miedo al juicio”.'
+              : 'Revisa los fragmentos marcados en rojo: cada uno tiene señales específicas que orientan el código.');
+        }
+      });
+    });
+  });
+})();
+
+/* ============================================================
+   4. EMPAREJAMIENTO (Actividad 5)
+   ============================================================ */
+(function(){
+  const left = document.querySelectorAll('#matchLeft .match-card');
+  const right = document.querySelectorAll('#matchRight .match-card');
+  const fb = document.getElementById('fb5');
+  if (!left.length || !fb) return;
+  let seleccionada = null;
+  let emparejadas = 0;
+
+  left.forEach(card => {
+    card.addEventListener('click', () => {
+      if (card.classList.contains('matched')) return;
+      left.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      seleccionada = card;
+    });
+  });
+
+  right.forEach(card => {
+    card.addEventListener('click', () => {
+      if (!seleccionada || card.classList.contains('matched')) return;
+      const ok = seleccionada.dataset.id === card.dataset.match;
+      if (ok){
+        seleccionada.classList.remove('selected');
+        seleccionada.classList.add('matched');
+        card.classList.add('matched');
+        emparejadas++;
+        seleccionada = null;
+        if (emparejadas === left.length){
+          fb.classList.add('ok');
+          fb.classList.remove('no');
+          fb.innerHTML = '✔ ¡Excelente! Emparejaste los cuatro diseños cualitativos con su propósito.';
+        }
+      } else {
+        fb.classList.add('no');
+        fb.classList.remove('ok');
+        fb.innerHTML = '✘ Esa pareja no corresponde. Piensa en qué busca comprender cada diseño.';
+      }
+    });
+  });
+})();
+
+/* ============================================================
+   5. GRÁFICAS CUANTITATIVAS
+   Tres gráficos generados con canvas puro:
+   - Histograma de estrés académico
+   - Dispersión estrés vs calidad del sueño (con línea de tendencia)
+   - Barras comparando dos grupos
+   ============================================================ */
+
+/* --- 5.1 Histograma --- */
+(function(){
+  const canvas = document.getElementById('grafHist');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, W, H);
+
+  // Datos: distribución aproximadamente normal alrededor de 24
+  const bins = [2, 5, 12, 28, 52, 74, 82, 68, 46, 26, 12, 5];
+  const maxBin = Math.max(...bins);
+  const margenIzq = 50, margenDer = 20, margenSup = 30, margenInf = 50;
+  const ancho = W - margenIzq - margenDer;
+  const alto = H - margenSup - margenInf;
+  const anchoBarra = ancho / bins.length;
+
+  // Eje Y
+  ctx.strokeStyle = '#E4E9F0'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++){
+    const y = margenSup + (alto * i / 4);
+    ctx.beginPath(); ctx.moveTo(margenIzq, y); ctx.lineTo(margenIzq + ancho, y); ctx.stroke();
+  }
+
+  // Barras
+  bins.forEach((v, i) => {
+    const h = (v / maxBin) * alto;
+    const x = margenIzq + i * anchoBarra + 2;
+    const y = margenSup + alto - h;
+    const grad = ctx.createLinearGradient(0, y, 0, margenSup + alto);
+    grad.addColorStop(0, '#13538A');
+    grad.addColorStop(1, '#0B2545');
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, y, anchoBarra - 4, h);
+  });
+
+  // Ejes
+  ctx.strokeStyle = '#0B2545'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(margenIzq, margenSup); ctx.lineTo(margenIzq, margenSup + alto);
+  ctx.lineTo(margenIzq + ancho, margenSup + alto);
+  ctx.stroke();
+
+  // Etiquetas
+  ctx.fillStyle = '#3E4E68'; ctx.font = '13px Segoe UI';
+  ctx.textAlign = 'center';
+  ctx.fillText('Bajo', margenIzq + ancho * 0.1, margenSup + alto + 22);
+  ctx.fillText('Medio', margenIzq + ancho * 0.5, margenSup + alto + 22);
+  ctx.fillText('Alto', margenIzq + ancho * 0.9, margenSup + alto + 22);
+  ctx.textAlign = 'left';
+  ctx.save(); ctx.translate(16, margenSup + alto / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'center';
+  ctx.fillText('Frecuencia', 0, 0);
+  ctx.restore();
+  ctx.textAlign = 'left';
+})();
+
+/* --- 5.2 Dispersión con línea de tendencia --- */
+(function(){
+  const canvas = document.getElementById('grafDisp');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, W, H);
+
+  const margenIzq = 55, margenDer = 22, margenSup = 26, margenInf = 46;
+  const ancho = W - margenIzq - margenDer;
+  const alto = H - margenSup - margenInf;
+
+  // Rejilla
+  ctx.strokeStyle = '#E4E9F0'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++){
+    const y = margenSup + (alto * i / 4);
+    ctx.beginPath(); ctx.moveTo(margenIzq, y); ctx.lineTo(margenIzq + ancho, y); ctx.stroke();
+    const x = margenIzq + (ancho * i / 4);
+    ctx.beginPath(); ctx.moveTo(x, margenSup); ctx.lineTo(x, margenSup + alto); ctx.stroke();
+  }
+
+  // Generar puntos: relación negativa entre estrés (x) y calidad del sueño (y)
+  // pendiente aproximada -0.55, con dispersión
+  const puntos = [];
+  for (let i = 0; i < 80; i++){
+    const x = Math.random();                         // 0..1 = estrés
+    const ruido = (Math.random() - 0.5) * 0.5;
+    const y = 0.85 - 0.55 * x + ruido;               // 0..1 = calidad sueño
+    if (y >= 0 && y <= 1) puntos.push({x, y});
+  }
+
+  // Línea de tendencia
+  ctx.strokeStyle = '#C1543F'; ctx.lineWidth = 3;
+  ctx.beginPath();
+  const px1 = margenIzq;
+  const py1 = margenSup + alto - (0.85) * alto;
+  const px2 = margenIzq + ancho;
+  const py2 = margenSup + alto - (0.85 - 0.55) * alto;
+  ctx.moveTo(px1, py1); ctx.lineTo(px2, py2);
+  ctx.stroke();
+
+  // Puntos
+  ctx.fillStyle = 'rgba(19,83,138,.62)';
+  puntos.forEach(p => {
+    const px = margenIzq + p.x * ancho;
+    const py = margenSup + alto - p.y * alto;
+    ctx.beginPath();
+    ctx.arc(px, py, 5, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Ejes
+  ctx.strokeStyle = '#0B2545'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(margenIzq, margenSup); ctx.lineTo(margenIzq, margenSup + alto);
+  ctx.lineTo(margenIzq + ancho, margenSup + alto);
+  ctx.stroke();
+
+  // Etiquetas
+  ctx.fillStyle = '#3E4E68'; ctx.font = '13px Segoe UI';
+  ctx.textAlign = 'center';
+  ctx.fillText('Estrés académico →', margenIzq + ancho / 2, margenSup + alto + 24);
+  ctx.textAlign = 'left';
+  ctx.save(); ctx.translate(16, margenSup + alto / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'center';
+  ctx.fillText('Calidad del sueño →', 0, 0);
+  ctx.restore();
+  ctx.textAlign = 'left';
+
+  // Etiqueta r
+  ctx.fillStyle = '#C1543F';
+  ctx.font = 'bold 15px Segoe UI';
+  ctx.fillText('r ≈ −0.55', margenIzq + ancho - 100, margenSup + 20);
+})();
+
+/* --- 5.3 Barras comparando grupos --- */
+(function(){
+  const canvas = document.getElementById('grafBarras');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, W, H);
+
+  const margenIzq = 70, margenDer = 30, margenSup = 30, margenInf = 60;
+  const ancho = W - margenIzq - margenDer;
+  const alto = H - margenSup - margenInf;
+
+  // Datos ficticios: estrés promedio en dos grupos
+  const grupos = [
+    {nombre: 'Control', valor: 24, color: '#13538A'},
+    {nombre: 'Mindfulness', valor: 17, color: '#3C8C4A'}
+  ];
+  const maxValor = 30;
+  const anchoBarra = ancho / grupos.length * 0.55;
+  const separacion = ancho / grupos.length;
+
+  // Rejilla
+  ctx.strokeStyle = '#E4E9F0'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 3; i++){
+    const y = margenSup + (alto * i / 3);
+    ctx.beginPath(); ctx.moveTo(margenIzq, y); ctx.lineTo(margenIzq + ancho, y); ctx.stroke();
+  }
+
+  // Barras
+  grupos.forEach((g, i) => {
+    const h = (g.valor / maxValor) * alto;
+    const x = margenIzq + separacion * i + (separacion - anchoBarra) / 2;
+    const y = margenSup + alto - h;
+    const grad = ctx.createLinearGradient(0, y, 0, margenSup + alto);
+    grad.addColorStop(0, g.color);
+    grad.addColorStop(1, g.color + 'AA');
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, y, anchoBarra, h);
+
+    // Valor
+    ctx.fillStyle = '#0B2545';
+    ctx.font = 'bold 16px Segoe UI';
+    ctx.textAlign = 'center';
+    ctx.fillText(g.valor.toString(), x + anchoBarra / 2, y - 8);
+
+    // Nombre
+    ctx.fillStyle = '#3E4E68';
+    ctx.font = '14px Segoe UI';
+    ctx.fillText(g.nombre, x + anchoBarra / 2, margenSup + alto + 22);
+  });
+
+  // Eje
+  ctx.strokeStyle = '#0B2545'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(margenIzq, margenSup); ctx.lineTo(margenIzq, margenSup + alto);
+  ctx.lineTo(margenIzq + ancho, margenSup + alto);
+  ctx.stroke();
+
+  // Etiqueta Y
+  ctx.fillStyle = '#3E4E68'; ctx.font = '13px Segoe UI';
+  ctx.save(); ctx.translate(20, margenSup + alto / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'center';
+  ctx.fillText('Estrés promedio', 0, 0);
+  ctx.restore();
+  ctx.textAlign = 'left';
+})();
+
+/* ============================================================
+   6. SIMULACIÓN: MATRIZ DE DECISIÓN
+   ============================================================ */
+const m1 = document.getElementById('m1');
+const m2 = document.getElementById('m2');
+const m3 = document.getElementById('m3');
+const matrizResultado = document.getElementById('matrizResultado');
+
+function evaluarMatriz(){
+  const v1 = m1.value, v2 = m2.value, v3 = m3.value;
+  if (!v1 || !v2 || !v3){
+    matrizResultado.innerHTML = `
+      <h3>Matriz en construcción</h3>
+      <p class="lead">Responde las tres preguntas para ver qué enfoque emerge.</p>
+      <div class="card azul" style="margin-top:16px; font-size:20px;">
+        <strong>Recuerda:</strong> no hay un enfoque “mejor”. Hay enfoques que corresponden mejor a ciertas preguntas.
+      </div>
+    `;
+    return;
+  }
+  const voto = {cuanti:0, cuali:0, mixto:0};
+  voto[v1]++; voto[v2]++; voto[v3]++;
+  let elegido = 'mixto', max = 0;
+  for (const k of ['cuanti','cuali','mixto']){
+    if (voto[k] > max){ max = voto[k]; elegido = k; }
+  }
+  const datos = {
+    cuanti: {
+      badge: 'Enfoque cuantitativo',
+      clase: 'azul',
+      descripcion: 'Buscas medir, comparar, relacionar o predecir. Los datos numéricos y el análisis estadístico son el camino apropiado. El diseño se orientará a operacionalizar variables, seleccionar instrumentos válidos y aplicar estadística descriptiva e inferencial.',
+      ejemplo: 'Ejemplo: ¿existe relación entre horas de sueño y rendimiento en atención sostenida?'
+    },
+    cuali: {
+      badge: 'Enfoque cualitativo',
+      clase: 'dorado',
+      descripcion: 'Buscas comprender experiencias, significados, procesos o contextos. Los datos textuales y el análisis interpretativo son el camino apropiado. El diseño se orientará a producir información rica, con análisis temático, narrativo, fenomenológico o etnográfico.',
+      ejemplo: 'Ejemplo: ¿cómo describen los estudiantes la experiencia de ansiedad antes de los exámenes finales?'
+    },
+    mixto: {
+      badge: 'Enfoque mixto',
+      clase: 'verde',
+      descripcion: 'Necesitas medir y comprender. Los métodos mixtos integran los dos tipos de evidencia, pero exigen planear en qué punto y cómo se integran los componentes. Sin integración, no hay métodos mixtos.',
+      ejemplo: 'Ejemplo: ¿qué relación existe entre uso de IA y rendimiento y cómo explican los estudiantes esa relación?'
+    }
+  };
+  const d = datos[elegido];
+  matrizResultado.innerHTML = `
+    <span class="pill ${d.clase}" style="font-size:24px;">${d.badge}</span>
+    <p>${d.descripcion}</p>
+    <div class="card azul" style="font-size:22px;">${d.ejemplo}</div>
+  `;
+}
+[m1,m2,m3].forEach(sel => sel.addEventListener('change', evaluarMatriz));
+evaluarMatriz();
+
+/* ============================================================
+   7. AUTOEVALUACIÓN FINAL (8 preguntas)
+   ============================================================ */
+const autoevalCont = document.getElementById('autoeval');
+const resumenQuiz = document.getElementById('resumenQuiz');
+const puntajeFinal = document.getElementById('puntajeFinal');
+const barQuiz = document.getElementById('barQuiz');
+const mensajeQuiz = document.getElementById('mensajeQuiz');
+const btnReiniciar = document.getElementById('btnReiniciarQuiz');
+
+const preguntasAuto = [
+  {
+    enunciado: '¿Cuál es la diferencia principal entre investigación cuantitativa y cualitativa?',
+    opciones: [
+      {texto:'La cuantitativa mide variables y la cualitativa comprende experiencias y significados.', ok:true},
+      {texto:'La cuantitativa es objetiva y la cualitativa es subjetiva.', ok:false},
+      {texto:'La cuantitativa es científica y la cualitativa no.', ok:false}
+    ]
+  },
+  {
+    enunciado: 'Una pregunta que busca “comprender cómo las personas describen un fenómeno” corresponde a:',
+    opciones: [
+      {texto:'Investigación cualitativa.', ok:true},
+      {texto:'Investigación cuantitativa.', ok:false},
+      {texto:'Investigación experimental.', ok:false}
+    ]
+  },
+  {
+    enunciado: 'El análisis temático reflexivo (Braun y Clarke) es un método:',
+    opciones: [
+      {texto:'Cualitativo.', ok:true},
+      {texto:'Cuantitativo.', ok:false},
+      {texto:'Exclusivamente mixto.', ok:false}
+    ]
+  },
+  {
+    enunciado: '“El grupo experimental obtuvo puntajes promedio más altos que el control.” Esta afirmación es propia de:',
+    opciones: [
+      {texto:'Investigación cuantitativa.', ok:true},
+      {texto:'Investigación cualitativa.', ok:false},
+      {texto:'Ninguno de los dos enfoques.', ok:false}
+    ]
+  },
+  {
+    enunciado: '¿Cuál de estos NO es un diseño cualitativo?',
+    opciones: [
+      {texto:'Ensayo controlado aleatorizado.', ok:true},
+      {texto:'Fenomenología.', ok:false},
+      {texto:'Etnografía.', ok:false}
+    ]
+  },
+  {
+    enunciado: 'En investigación cualitativa, la “reflexividad” se refiere a:',
+    opciones: [
+      {texto:'Reconocer cómo la posición del investigador influye en la producción e interpretación de los datos.', ok:true},
+      {texto:'Aplicar pruebas estadísticas para verificar hipótesis.', ok:false},
+      {texto:'Aumentar el tamaño de la muestra hasta la saturación.', ok:false}
+    ]
+  },
+  {
+    enunciado: '¿Cuándo conviene un diseño mixto?',
+    opciones: [
+      {texto:'Cuando medir y comprender se necesitan mutuamente para responder la pregunta.', ok:true},
+      {texto:'Siempre que sea posible, porque es más completo.', ok:false},
+      {texto:'Solo cuando no es posible hacer un experimento.', ok:false}
+    ]
+  },
+  {
+    enunciado: 'La afirmación “La investigación cualitativa es menos rigurosa que la cuantitativa” es:',
+    opciones: [
+      {texto:'Falsa: el rigor depende de la coherencia metodológica, no del tipo de datos.', ok:true},
+      {texto:'Verdadera: sin estadística no hay rigor.', ok:false},
+      {texto:'Depende del tamaño de la muestra.', ok:false}
+    ]
+  }
+];
+
+let respuestasAuto = [];
+let autoevalRespondida = false;
+
+function renderAutoeval(){
+  autoevalCont.innerHTML = '';
+  respuestasAuto = new Array(preguntasAuto.length).fill(null);
+  autoevalRespondida = false;
+  resumenQuiz.style.display = 'none';
+
+  preguntasAuto.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-pregunta';
+    const pEnunciado = document.createElement('p');
+    pEnunciado.className = 'enunciado';
+    pEnunciado.innerHTML = `<span class="num">${i+1}</span>${p.enunciado}`;
+    div.appendChild(pEnunciado);
+
+    p.opciones.forEach((op, j) => {
+      const b = document.createElement('button');
+      b.className = 'opcion';
+      b.textContent = op.texto;
+      b.addEventListener('click', () => {
+        if (respuestasAuto[i] !== null) return;
+        respuestasAuto[i] = op.ok;
+        div.querySelectorAll('.opcion').forEach((bb, jj) => {
+          bb.disabled = true;
+          if (p.opciones[jj].ok) bb.classList.add('correcta');
+        });
+        if (!op.ok) b.classList.add('incorrecta');
+        actualizarPuntaje();
+      });
+      div.appendChild(b);
+    });
+    autoevalCont.appendChild(div);
+  });
+}
+
+function actualizarPuntaje(){
+  const total = respuestasAuto.filter(r => r === true).length;
+  const respondidas = respuestasAuto.filter(r => r !== null).length;
+
+  resumenQuiz.style.display = 'block';
+  puntajeFinal.textContent = `${total} / ${preguntasAuto.length}`;
+  barQuiz.style.width = (respondidas / preguntasAuto.length * 100) + '%';
+
+  if (respondidas === preguntasAuto.length){
+    let mensaje;
+    if (total === preguntasAuto.length) mensaje = '¡Perfecto! Dominas la distinción entre ambos enfoques.';
+    else if (total >= preguntasAuto.length * 0.75) mensaje = 'Muy bien. Tienes una comprensión sólida. Revisa las preguntas falladas para afinar detalles.';
+    else if (total >= preguntasAuto.length * 0.5) mensaje = 'Vas por buen camino. Repasa las diapositivas sobre cuándo usar cada enfoque y las actividades de clasificación.';
+    else mensaje = 'Conviene repasar el recorrido desde el inicio. Vuelve a las simulaciones y a las diapositivas 5 a 10.';
+    mensajeQuiz.textContent = mensaje;
+  } else {
+    mensajeQuiz.textContent = `Has respondido ${respondidas} de ${preguntasAuto.length} preguntas.`;
+  }
+}
+
+btnReiniciar.addEventListener('click', () => {
+  renderAutoeval();
+  // Desplazar suavemente al inicio de la autoevaluación
+  autoevalCont.scrollIntoView({behavior:'smooth', block:'start'});
+});
+renderAutoeval();
+</script>
+</body>
+</html>
