@@ -1,0 +1,22 @@
+{
+  "temas": [
+    "Pensamiento",
+    "Lenguaje",
+    "Razonamiento",
+    "Resolución de problemas",
+    "Desarrollo",
+    "Significado"
+  ],
+  "artefactos": [
+    {
+      "titulo": "Artefacto de ejemplo",
+      "descripcion": "Ejemplo para comprobar cómo el catálogo genera una tarjeta sin modificar el index.html.",
+      "tema": "Pensamiento",
+      "tipo": "Interactivo",
+      "uso": "ambos",
+      "carpeta": "artefacto-ejemplo",
+      "icono": "💭",
+      "etiquetas": ["ejemplo"]
+    }
+  ]
+}
