@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pensamiento y Lenguaje · Presentación Interactiva</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ============================================================
+       VARIABLES Y RESET
+       ============================================================ */
+    :root {
+      --azul-oscuro: #0B2545;
+      --azul-medio: #13315C;
+      --azul-acento: #13538A;
+      --dorado: #E7C873;
+      --gris-calido: #F5F3EF;
+      --gris-texto: #2E2E2E;
+      --blanco: #FFFFFF;
+      --sombra: 0 4px 20px rgba(11, 37, 69, 0.08);
+      --radio: 14px;
+      --transicion: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      --fuente: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--fuente);
+      background: var(--blanco);
+      color: var(--gris-texto);
+    }
+
+    /* ============================================================
+       CONTENEDOR PRINCIPAL
+       ============================================================ */
+    .presentacion {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .diapositiva {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 90px 80px 110px 80px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity var(--transicion), visibility var(--transicion);
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: var(--blanco);
+    }
+
+    .diapositiva.activa {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .diapositiva.portada {
+      background: linear-gradient(135deg, var(--azul-oscuro) 0%, var(--azul-medio) 100%);
+      color: var(--blanco);
+      justify-content: center;
+      text-align: center;
+      padding: 60px 80px;
+    }
+
+    /* Scrollbar estilizada */
+    .diapositiva::-webkit-scrollbar {
+      width: 10px;
+    }
+    .diapositiva::-webkit-scrollbar-track {
+      background: #F0F0F0;
+    }
+    .diapositiva::-webkit-scrollbar-thumb {
+      background: var(--azul-acento);
+      border-radius: 5px;
+    }
+
+    /* ============================================================
+       TIPOGRAFÍA (aumentada)
+       ============================================================ */
+    h1 {
+      font-size: 56px;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      letter-spacing: -0.5px;
+    }
+
+    h2 {
+      font-size: 46px;
+      font-weight: 700;
+      color: var(--azul-oscuro);
+      margin-bottom: 30px;
+      line-height: 1.2;
+      letter-spacing: -0.3px;
+    }
+
+    h3 {
+      font-size: 30px;
+      font-weight: 600;
+      color: var(--azul-medio);
+      margin-bottom: 16px;
+    }
+
+    p, li {
+      font-size: 24px;
+      line-height: 1.65;
+      color: var(--gris-texto);
+    }
+
+    .portada h1 {
+      font-size: 62px;
+      color: var(--blanco);
+    }
+
+    .portada .subtitulo {
+      font-size: 30px;
+      color: var(--dorado);
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+
+    .portada .contexto {
+      font-size: 23px;
+      color: rgba(255,255,255,0.85);
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ============================================================
+       LAYOUT DE CONTENIDO
+       ============================================================ */
+    .contenido {
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .dos-columnas {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .tarjeta {
+      background: var(--gris-calido);
+      border-radius: var(--radio);
+      padding: 28px 32px;
+      border-left: 6px solid var(--azul-acento);
+      box-shadow: var(--sombra);
+      margin-bottom: 18px;
+    }
+
+    .tarjeta.dorada {
+      border-left-color: var(--dorado);
+      background: #FDF9EE;
+    }
+
+    .tarjeta.azul {
+      background: #EEF3F9;
+      border-left-color: var(--azul-medio);
+    }
+
+    .tarjeta h3 {
+      margin-bottom: 12px;
+    }
+
+    .tarjeta p, .tarjeta li {
+      font-size: 22px;
+      line-height: 1.55;
+    }
+
+    ul.lista {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul.lista li {
+      padding: 8px 0 8px 34px;
+      position: relative;
+      font-size: 22px;
+    }
+
+    ul.lista li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--azul-acento);
+      font-weight: 700;
+    }
+
+    .destacado {
+      background: var(--azul-oscuro);
+      color: var(--blanco);
+      padding: 26px 34px;
+      border-radius: var(--radio);
+      font-size: 26px;
+      font-weight: 500;
+      text-align: center;
+      margin: 22px 0;
+      line-height: 1.5;
+    }
+
+    .destacado.dorado {
+      background: var(--dorado);
+      color: var(--azul-oscuro);
+    }
+
+    .pregunta-central {
+      font-size: 28px;
+      font-style: italic;
+      color: var(--azul-medio);
+      text-align: center;
+      padding: 24px;
+      border-top: 3px solid var(--dorado);
+      border-bottom: 3px solid var(--dorado);
+      margin: 26px 0;
+      line-height: 1.5;
+    }
+
+    /* ============================================================
+       NAVEGACIÓN LATERAL
+       ============================================================ */
+    .nav-lateral {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 280px;
+      background: var(--azul-oscuro);
+      z-index: 1000;
+      transform: translateX(-100%);
+      transition: transform var(--transicion);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 0;
+      overflow-y: auto;
+    }
+
+    .nav-lateral.abierto {
+      transform: translateX(0);
+    }
+
+    .nav-lateral h3 {
+      color: var(--dorado);
+      font-size: 20px;
+      padding: 0 26px 18px 26px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nav-lateral a {
+      display: block;
+      padding: 12px 26px;
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 18px;
+      transition: background 0.2s, color 0.2s;
+      border-left: 4px solid transparent;
+    }
+
+    .nav-lateral a:hover {
+      background: rgba(255,255,255,0.06);
+      color: var(--blanco);
+    }
+
+    .nav-lateral a.activo {
+      color: var(--dorado);
+      border-left-color: var(--dorado);
+      background: rgba(231, 200, 115, 0.08);
+    }
+
+    .btn-menu {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--azul-oscuro);
+      color: var(--blanco);
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--sombra);
+      transition: background 0.2s;
+    }
+
+    .btn-menu:hover {
+      background: var(--azul-medio);
+    }
+
+    /* ============================================================
+       BOTONES DE NAVEGACIÓN
+       ============================================================ */
+    .btn-nav {
+      position: fixed;
+      bottom: 26px;
+      z-index: 999;
+      background: var(--blanco);
+      color: var(--azul-oscuro);
+      border: 2px solid var(--azul-oscuro);
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--fuente);
+    }
+
+    .btn-nav:hover:not(:disabled) {
+      background: var(--azul-oscuro);
+      color: var(--blanco);
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .btn-prev { left: 26px; }
+    .btn-next { right: 26px; }
+
+    /* ============================================================
+       INDICADOR DE PROGRESO
+       ============================================================ */
+    .progreso {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: rgba(11, 37, 69, 0.1);
+      z-index: 998;
+    }
+
+    .progreso .barra {
+      height: 100%;
+      background: linear-gradient(90deg, var(--azul-acento), var(--dorado));
+      width: 0%;
+      transition: width var(--transicion);
+    }
+
+    .contador {
+      position: fixed;
+      bottom: 16px;
+      right: 26px;
+      font-size: 16px;
+      color: var(--azul-oscuro);
+      font-weight: 700;
+      background: rgba(255,255,255,0.95);
+      padding: 6px 14px;
+      border-radius: 20px;
+      z-index: 998;
+      border: 1px solid #E0E8F0;
+    }
+
+    /* ============================================================
+       ACTIVIDADES INTERACTIVAS
+       ============================================================ */
+    .actividad {
+      background: #F8FAFD;
+      border-radius: var(--radio);
+      padding: 32px;
+      border: 1px solid #E0E8F0;
+      width: 100%;
+    }
+
+    .opcion {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: var(--blanco);
+      border: 2px solid #D0D9E4;
+      border-radius: 10px;
+      padding: 18px 26px;
+      margin: 12px 0;
+      font-size: 22px;
+      line-height: 1.4;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--fuente);
+      color: var(--gris-texto);
+      white-space: normal;
+      word-wrap: break-word;
+      min-height: 60px;
+      height: auto;
+    }
+
+    .opcion:hover:not(:disabled) {
+      border-color: var(--azul-acento);
+      background: #F0F6FC;
+    }
+
+    .opcion.correcta {
+      border-color: #2E7D32;
+      background: #E8F5E9;
+    }
+
+    .opcion.incorrecta {
+      border-color: #C62828;
+      background: #FFEBEE;
+    }
+
+    .opcion:disabled {
+      cursor: default;
+      opacity: 0.95;
+    }
+
+    .retro {
+      margin-top: 18px;
+      padding: 18px 22px;
+      border-radius: 10px;
+      font-size: 21px;
+      line-height: 1.55;
+      display: none;
+    }
+
+    .retro.visible {
+      display: block;
+    }
+
+    .retro.ok {
+      background: #E8F5E9;
+      border-left: 5px solid #2E7D32;
+      color: #1B5E20;
+    }
+
+    .retro.no {
+      background: #FFEBEE;
+      border-left: 5px solid #C62828;
+      color: #B71C1C;
+    }
+
+    /* Arrastrar y soltar */
+    .zona-soltar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .categoria {
+      background: var(--blanco);
+      border: 2px dashed #B0C4DE;
+      border-radius: 12px;
+      padding: 18px;
+      min-height: 160px;
+      transition: all 0.2s;
+    }
+
+    .categoria.sobre {
+      border-color: var(--azul-acento);
+      background: #EEF3F9;
+    }
+
+    .categoria h4 {
+      font-size: 20px;
+      color: var(--azul-medio);
+      margin-bottom: 14px;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .item-arrastrable {
+      background: var(--azul-medio);
+      color: var(--blanco);
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin: 8px 0;
+      cursor: grab;
+      font-size: 18px;
+      line-height: 1.4;
+      text-align: left;
+      transition: transform 0.15s;
+      user-select: none;
+      word-wrap: break-word;
+    }
+
+    .item-arrastrable:active {
+      cursor: grabbing;
+      transform: scale(1.02);
+    }
+
+    .items-sueltos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 22px;
+      min-height: 60px;
+      padding: 12px;
+      background: #F0F4F8;
+      border-radius: 10px;
+    }
+
+    /* Tarjetas de memoria */
+    .grid-memoria {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .tarjeta-memoria {
+      perspective: 1000px;
+      height: 170px;
+      cursor: pointer;
+    }
+
+    .tarjeta-memoria .interior {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.55s;
+      transform-style: preserve-3d;
+    }
+
+    .tarjeta-memoria.volteada .interior {
+      transform: rotateY(180deg);
+    }
+
+    .tarjeta-memoria .cara {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.35;
+      overflow: hidden;
+      word-wrap: break-word;
+      hyphens: auto;
+    }
+
+    .tarjeta-memoria .frente {
+      background: var(--azul-medio);
+      color: var(--blanco);
+    }
+
+    .tarjeta-memoria .reverso {
+      background: var(--dorado);
+      color: var(--azul-oscuro);
+      transform: rotateY(180deg);
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    /* Simulación */
+    .simulador {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      width: 100%;
+      align-items: start;
+    }
+
+    .controles-sim {
+      background: var(--gris-calido);
+      border-radius: var(--radio);
+      padding: 28px;
+    }
+
+    .control-grupo {
+      margin-bottom: 22px;
+    }
+
+    .control-grupo label {
+      display: block;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--azul-medio);
+      margin-bottom: 10px;
+    }
+
+    .control-grupo input[type="range"] {
+      width: 100%;
+      accent-color: var(--azul-acento);
+      height: 8px;
+      cursor: pointer;
+    }
+
+    .control-grupo .valor {
+      font-size: 18px;
+      color: var(--azul-oscuro);
+      float: right;
+      font-weight: 700;
+    }
+
+    .btn-sim {
+      background: var(--azul-oscuro);
+      color: var(--blanco);
+      border: none;
+      padding: 14px 26px;
+      border-radius: 10px;
+      font-size: 19px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      transition: background 0.2s;
+      font-family: var(--fuente);
+    }
+
+    .btn-sim:hover {
+      background: var(--azul-medio);
+    }
+
+    .btn-sim.activo {
+      background: var(--dorado);
+      color: var(--azul-oscuro);
+    }
+
+    .resultado-sim {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      padding: 24px;
+      border: 1px solid #E0E8F0;
+    }
+
+    .resultado-sim h4 {
+      font-size: 22px;
+      color: var(--azul-oscuro);
+      margin-bottom: 16px;
+    }
+
+    .grafico-contenedor {
+      position: relative;
+      height: 260px;
+      margin-bottom: 18px;
+    }
+
+    .feedback-sim {
+      font-size: 19px;
+      line-height: 1.55;
+      color: var(--gris-texto);
+      background: #F0F6FC;
+      padding: 16px 20px;
+      border-radius: 10px;
+      border-left: 5px solid var(--azul-acento);
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1100px) {
+      .diapositiva { padding: 80px 40px 100px 40px; }
+      h1 { font-size: 44px; }
+      h2 { font-size: 38px; }
+      h3 { font-size: 26px; }
+      p, li { font-size: 21px; }
+      .portada h1 { font-size: 46px; }
+      .portada .subtitulo { font-size: 24px; }
+      .grid-memoria { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 850px) {
+      .diapositiva { padding: 70px 24px 90px 24px; }
+      h1 { font-size: 34px; }
+      h2 { font-size: 30px; }
+      h3 { font-size: 22px; }
+      p, li { font-size: 19px; }
+      .portada h1 { font-size: 36px; }
+      .portada .subtitulo { font-size: 20px; }
+      .dos-columnas { grid-template-columns: 1fr; gap: 18px; }
+      .simulador { grid-template-columns: 1fr; }
+      .grid-memoria { grid-template-columns: 1fr; }
+      .tarjeta-memoria { height: 150px; }
+      .zona-soltar { grid-template-columns: 1fr; }
+      .nav-lateral { width: 240px; }
+      .btn-prev { left: 12px; }
+      .btn-next { right: 12px; }
+      .contador { right: 12px; }
+      .opcion { font-size: 19px; padding: 16px 20px; }
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 28px; }
+      h2 { font-size: 24px; }
+      p, li { font-size: 17px; }
+      .diapositiva { padding: 60px 14px 80px 14px; }
+      .btn-nav { padding: 8px 14px; font-size: 14px; }
+      .tarjeta-memoria .cara { font-size: 15px; }
+      .tarjeta-memoria .reverso { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       NAVEGACIÓN LATERAL
+       ============================================================ -->
+  <button class="btn-menu" id="btnMenu" aria-label="Abrir menú">☰</button>
+  <nav class="nav-lateral" id="navLateral">
+    <h3>Secciones</h3>
+    <a href="#" data-slide="0">Portada</a>
+    <a href="#" data-slide="1">Agenda</a>
+    <a href="#" data-slide="2">¿De qué trata?</a>
+    <a href="#" data-slide="3">Pensamiento</a>
+    <a href="#" data-slide="4">Actividad 1</a>
+    <a href="#" data-slide="5">Representaciones</a>
+    <a href="#" data-slide="6">Sesgos y metacognición</a>
+    <a href="#" data-slide="7">Actividad 2</a>
+    <a href="#" data-slide="8">Teoría de la mente</a>
+    <a href="#" data-slide="9">Simulación</a>
+    <a href="#" data-slide="10">Lenguaje y cultura</a>
+    <a href="#" data-slide="11">Actividad 3</a>
+    <a href="#" data-slide="12">Inteligencia</a>
+    <a href="#" data-slide="13">Actividad 4</a>
+    <a href="#" data-slide="14">Síntesis</a>
+  </nav>
+
+  <!-- ============================================================
+       PRESENTACIÓN
+       ============================================================ -->
+  <div class="presentacion" id="presentacion">
+
+    <!-- DIAPOSITIVA 1: PORTADA -->
+    <section class="diapositiva portada activa" data-slide="0">
+      <div class="contenido" style="text-align:center;">
+        <h1>Pensamiento y Lenguaje</h1>
+        <p class="subtitulo">Psicología cognitiva, cultura y contexto</p>
+        <p class="contexto">
+          Un recorrido por los procesos cognitivos que nos permiten representar, razonar,
+          comunicar y adaptarnos. Curso de 3 créditos · Dos unidades · Psicología
+        </p>
+        <div style="margin-top:44px;">
+          <span style="display:inline-block; background:rgba(231,200,115,0.15); color:var(--dorado); padding:14px 28px; border-radius:30px; font-size:20px;">
+            Usa las flechas ← → o el menú para navegar
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 2: AGENDA -->
+    <section class="diapositiva" data-slide="1">
+      <div class="contenido">
+        <h2>Agenda de la presentación</h2>
+        <div class="dos-columnas">
+          <div>
+            <div class="tarjeta azul">
+              <h3>Unidad 1</h3>
+              <ul class="lista">
+                <li>Pensamiento y representaciones mentales</li>
+                <li>Conceptos y categorización</li>
+                <li>Sesgos, metacognición y solución de problemas</li>
+                <li>Teoría de la mente y cognición social</li>
+                <li>Lenguaje, cultura y bilingüismo</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="tarjeta dorada">
+              <h3>Unidad 2</h3>
+              <ul class="lista">
+                <li>¿Qué entendemos por inteligencia?</li>
+                <li>Modelos clásicos y contemporáneos</li>
+                <li>Medición y psicometría</li>
+                <li>Inteligencia, cultura y contexto</li>
+                <li>Inteligencia emocional, cultural y colectiva</li>
+              </ul>
+            </div>
+            <div class="tarjeta" style="margin-top:18px;">
+              <h3>Actividades y simulación</h3>
+              <p>4 actividades interactivas + 1 simulador de categorización</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 3: ¿DE QUÉ TRATA? -->
+    <section class="diapositiva" data-slide="2">
+      <div class="contenido">
+        <h2>¿De qué trata este curso?</h2>
+        <div class="pregunta-central">
+          ¿Cómo construimos, transformamos y utilizamos representaciones para comprender el mundo, resolver problemas, comunicarnos y actuar con otros?
+        </div>
+        <div class="dos-columnas" style="margin-top:26px;">
+          <div class="tarjeta">
+            <h3>Pensamiento</h3>
+            <p>Representación mental, conceptos, razonamiento, toma de decisiones, solución de problemas, creatividad y sesgos.</p>
+          </div>
+          <div class="tarjeta azul">
+            <h3>Lenguaje</h3>
+            <p>Comprensión, producción, representación simbólica, significado, cultura, bilingüismo y relación lenguaje-pensamiento.</p>
+          </div>
+        </div>
+        <div class="tarjeta dorada" style="margin-top:22px;">
+          <h3>Inteligencia</h3>
+          <p>Capacidades cognitivas, diferencias individuales, modelos de inteligencia, evaluación y relación entre inteligencia, cultura y contexto.</p>
+        </div>
+        <p style="margin-top:26px; text-align:center; font-size:23px; color:var(--azul-medio);">
+          <strong>Eje integrador:</strong> la psicología cognitiva, en interacción con factores sociales, culturales, neurobiológicos y contextuales.
+        </p>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 4: PENSAMIENTO -->
+    <section class="diapositiva" data-slide="3">
+      <div class="contenido">
+        <h2>Pensamiento: más allá de hablar internamente</h2>
+        <div class="dos-columnas">
+          <div>
+            <div class="tarjeta">
+              <h3>¿Qué es pensar?</h3>
+              <p>La actividad mediante la cual manipulamos mentalmente información —palabras, imágenes, sonidos u otros datos— para transformarla en nuevas representaciones que permiten responder preguntas, tomar decisiones, resolver problemas o planificar.</p>
+            </div>
+            <div class="tarjeta azul" style="margin-top:18px;">
+              <h3>Representaciones mentales</h3>
+              <p>Imágenes mentales (visuales, auditivas, otras modalidades), conceptos, categorías y esquemas que dan forma a nuestra experiencia.</p>
+            </div>
+          </div>
+          <div>
+            <div class="destacado dorado">
+              ¿Todo pensamiento requiere lenguaje?
+            </div>
+            <div class="tarjeta dorada">
+              <h3>Un problema empírico y teórico</h3>
+              <p>Desde posiciones que consideran que el pensamiento depende del lenguaje hasta aquellas que sostienen que buena parte del pensamiento puede existir independientemente de él. Entre ambas hay hipótesis intermedias: ciertos tipos de pensamiento pueden depender causal o funcionalmente del lenguaje.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 5: ACTIVIDAD 1 - VERDADERO O FALSO -->
+    <section class="diapositiva" data-slide="4">
+      <div class="contenido">
+        <h2>Actividad 1: pon a prueba lo aprendido</h2>
+        <p style="margin-bottom:24px; font-size:23px;">Indica si las siguientes afirmaciones son verdaderas o falsas. Recibirás retroalimentación inmediata.</p>
+        <div class="actividad" id="act1">
+          <div id="act1-preguntas"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 6: REPRESENTACIONES Y CONCEPTOS -->
+    <section class="diapositiva" data-slide="5">
+      <div class="contenido">
+        <h2>Representaciones mentales y conceptos</h2>
+        <div class="dos-columnas">
+          <div>
+            <div class="tarjeta">
+              <h3>Imágenes mentales</h3>
+              <p>Representaciones internas de objetos o acontecimientos. No son solo visuales: incluyen modalidades auditivas y otras.</p>
+              <ul class="lista" style="margin-top:12px;">
+                <li>Imaginación y rotación mental</li>
+                <li>Representación espacial</li>
+                <li>Simulación y anticipación</li>
+                <li>Ensayo mental</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="tarjeta azul">
+              <h3>Conceptos y categorización</h3>
+              <p>Permiten agrupar objetos, acontecimientos o personas y organizar la experiencia en categorías manejables.</p>
+              <ul class="lista" style="margin-top:12px;">
+                <li>Prototipos y ejemplares</li>
+                <li>Formación de conceptos</li>
+                <li>Influencia de la experiencia</li>
+                <li>Relación con sesgos sociales</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="destacado" style="margin-top:26px;">
+          Cómo clasificamos a las personas y cómo interpretamos situaciones sociales está atravesado por nuestros conceptos y categorías.
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 7: SESGOS Y METACOGNICIÓN -->
+    <section class="diapositiva" data-slide="6">
+      <div class="contenido">
+        <h2>Sesgos, metacognición y solución de problemas</h2>
+        <div class="dos-columnas">
+          <div>
+            <div class="tarjeta">
+              <h3>Solución de problemas</h3>
+              <p>Un proceso estratégico y autorregulado:</p>
+              <ul class="lista" style="margin-top:10px;">
+                <li>Identificar el problema</li>
+                <li>Construir una representación</li>
+                <li>Generar alternativas</li>
+                <li>Seleccionar estrategias</li>
+                <li>Evaluar y modificar</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="tarjeta dorada">
+              <h3>Sesgos y errores</h3>
+              <p>El razonamiento humano no siempre opera de forma óptima:</p>
+              <ul class="lista" style="margin-top:10px;">
+                <li>Heurísticos y sesgos</li>
+                <li>Disponibilidad, representatividad, anclaje</li>
+                <li>Confirmación y perseverancia</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="tarjeta azul" style="margin-top:22px;">
+          <h3>Metacognición: pensar sobre cómo pensamos</h3>
+          <p>Conocimiento, monitoreo, regulación y evaluación de nuestros propios procesos cognitivos. Conecta pensamiento y lenguaje con aprendizaje y desempeño académico.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 8: ACTIVIDAD 2 - ARRASTRAR Y SOLTAR -->
+    <section class="diapositiva" data-slide="7">
+      <div class="contenido">
+        <h2>Actividad 2: clasifica los ejemplos</h2>
+        <p style="margin-bottom:22px; font-size:23px;">Arrastra cada situación a la categoría que corresponda.</p>
+        <div class="actividad">
+          <div class="items-sueltos" id="itemsArrastrar"></div>
+          <div class="zona-soltar">
+            <div class="categoria" data-cat="sesgo">
+              <h4>Sesgo cognitivo</h4>
+            </div>
+            <div class="categoria" data-cat="metacognicion">
+              <h4>Metacognición</h4>
+            </div>
+            <div class="categoria" data-cat="solucion">
+              <h4>Solución de problemas</h4>
+            </div>
+          </div>
+          <div class="retro" id="retroArrastrar"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 9: TEORÍA DE LA MENTE -->
+    <section class="diapositiva" data-slide="8">
+      <div class="contenido">
+        <h2>Teoría de la mente y cognición social</h2>
+        <div class="pregunta-central">
+          ¿Cómo podemos pensar acerca de lo que otra persona está pensando?
+        </div>
+        <div class="dos-columnas" style="margin-top:22px;">
+          <div class="tarjeta">
+            <h3>Teoría de la mente (ToM)</h3>
+            <p>Capacidad para representar estados mentales propios y ajenos: creencias, deseos, intenciones, conocimientos, emociones y perspectivas diferentes.</p>
+          </div>
+          <div class="tarjeta azul">
+            <h3>Cognición social</h3>
+            <ul class="lista">
+              <li>Atribución</li>
+              <li>Empatía</li>
+              <li>Comprensión de perspectivas</li>
+              <li>Comunicación e interacción</li>
+              <li>Desarrollo y cultura</li>
+            </ul>
+          </div>
+        </div>
+        <p style="margin-top:26px; text-align:center; font-size:23px; color:var(--azul-medio);">
+          <strong>Segunda pregunta:</strong> ¿Hasta qué punto nuestras interpretaciones de los estados mentales de otras personas dependen del contexto sociocultural?
+        </p>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 10: SIMULACIÓN -->
+    <section class="diapositiva" data-slide="9">
+      <div class="contenido">
+        <h2>Simulación: el laboratorio de categorización</h2>
+        <p style="margin-bottom:20px; font-size:22px;">Ajusta las características del estímulo y observa cómo un agente cognitivo lo categoriza. Activa un sesgo para ver cómo cambia la percepción.</p>
+        <div class="simulador">
+          <div class="controles-sim">
+            <div class="control-grupo">
+              <label>Forma <span class="valor" id="valForma">5</span></label>
+              <input type="range" id="forma" min="0" max="10" value="5" step="1">
+            </div>
+            <div class="control-grupo">
+              <label>Color <span class="valor" id="valColor">5</span></label>
+              <input type="range" id="color" min="0" max="10" value="5" step="1">
+            </div>
+            <div class="control-grupo">
+              <label>Tamaño <span class="valor" id="valTamano">5</span></label>
+              <input type="range" id="tamano" min="0" max="10" value="5" step="1">
+            </div>
+            <div class="control-grupo">
+              <label>Contexto <span class="valor" id="valContexto">5</span></label>
+              <input type="range" id="contexto" min="0" max="10" value="5" step="1">
+            </div>
+            <button class="btn-sim" id="btnSesgo">Activar sesgo de confirmación</button>
+            <button class="btn-sim" id="btnReset" style="margin-top:12px; background:var(--azul-acento);">Reiniciar</button>
+          </div>
+          <div class="resultado-sim">
+            <h4>Resultado de la categorización</h4>
+            <div class="grafico-contenedor">
+              <canvas id="graficoCategorias"></canvas>
+            </div>
+            <div class="feedback-sim" id="feedbackSim">
+              Ajusta los controles para ver cómo el agente cognitivo categoriza el estímulo.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 11: LENGUAJE Y CULTURA -->
+    <section class="diapositiva" data-slide="10">
+      <div class="contenido">
+        <h2>Lenguaje, cultura y cognición</h2>
+        <div class="pregunta-central">
+          ¿El idioma que hablamos influye en la manera en que pensamos?
+        </div>
+        <div class="dos-columnas" style="margin-top:22px;">
+          <div class="tarjeta">
+            <h3>Hipótesis Sapir-Whorf</h3>
+            <p><strong>Versión fuerte:</strong> determinadas formas de pensamiento serían imposibles sin un lenguaje específico.</p>
+            <p style="margin-top:12px;"><strong>Versiones moderadas:</strong> una lengua puede hacer que ciertos modos de pensamiento sean más probables o accesibles, sin determinar completamente la cognición.</p>
+          </div>
+          <div class="tarjeta azul">
+            <h3>Bilingüismo</h3>
+            <ul class="lista">
+              <li>Adquisición de dos lenguas</li>
+              <li>Competencia variable: comprensión, producción, lectura, escritura</li>
+              <li>Edad de adquisición y contexto social</li>
+              <li>Bilingüismo temprano/tardío, equilibrado/dominante</li>
+            </ul>
+          </div>
+        </div>
+        <div class="destacado dorado" style="margin-top:22px;">
+          Lenguaje → memoria → atención → representación → cultura → interacción social
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 12: ACTIVIDAD 3 - CUESTIONARIO -->
+    <section class="diapositiva" data-slide="11">
+      <div class="contenido">
+        <h2>Actividad 3: cuestionario de opción múltiple</h2>
+        <p style="margin-bottom:24px; font-size:23px;">Selecciona la respuesta correcta. Recibirás retroalimentación inmediata.</p>
+        <div class="actividad" id="act3"></div>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 13: INTELIGENCIA -->
+    <section class="diapositiva" data-slide="12">
+      <div class="contenido">
+        <h2>Inteligencia: modelos y medición</h2>
+        <div class="dos-columnas">
+          <div>
+            <div class="tarjeta">
+              <h3>¿Qué se entiende por inteligencia?</h3>
+              <p>Un constructo amplio y discutido. Incluye recordar, comprender, manipular mentalmente, recuperar y aplicar conocimientos, resolver problemas nuevos y actuar de manera flexible.</p>
+            </div>
+            <div class="tarjeta azul" style="margin-top:18px;">
+              <h3>Inteligencia fluida vs. cristalizada</h3>
+              <p><strong>Fluida:</strong> procesamiento en situaciones nuevas, velocidad, memoria de trabajo, razonamiento visuoespacial.</p>
+              <p style="margin-top:10px;"><strong>Cristalizada:</strong> conocimientos adquiridos, vocabulario, información aprendida.</p>
+            </div>
+          </div>
+          <div>
+            <div class="tarjeta dorada">
+              <h3>Modelos</h3>
+              <ul class="lista">
+                <li>Gardner: inteligencias múltiples</li>
+                <li>Sternberg: triárquica</li>
+                <li>Goleman: inteligencia emocional</li>
+              </ul>
+            </div>
+            <div class="tarjeta" style="margin-top:18px; border-left-color: #C62828;">
+              <h3>Medición y ética</h3>
+              <p>Psicometría, estandarización, confiabilidad, validez. Las pruebas tienen historia compleja y usos problemáticos. Es clave diferenciar: medir un constructo → interpretar una puntuación → tomar decisiones sobre una persona.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 14: ACTIVIDAD 4 - TARJETAS DE MEMORIA -->
+    <section class="diapositiva" data-slide="13">
+      <div class="contenido">
+        <h2>Actividad 4: tarjetas de memoria</h2>
+        <p style="margin-bottom:20px; font-size:23px;">Haz clic en cada tarjeta para voltearla y descubrir su contenido. Empareja conceptos y definiciones mentalmente.</p>
+        <div class="actividad">
+          <div class="grid-memoria" id="gridMemoria"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAPOSITIVA 15: SÍNTESIS Y CIERRE -->
+    <section class="diapositiva" data-slide="14">
+      <div class="contenido">
+        <h2>Síntesis: cuatro movimientos y un contexto</h2>
+        <div class="dos-columnas" style="margin-bottom:22px;">
+          <div class="tarjeta" style="text-align:center; border-left:none; border-top:5px solid var(--azul-acento);">
+            <h3 style="font-size:32px;">Representar</h3>
+            <p>Imágenes, conceptos, categorías</p>
+          </div>
+          <div class="tarjeta azul" style="text-align:center; border-left:none; border-top:5px solid var(--azul-medio);">
+            <h3 style="font-size:32px;">Pensar</h3>
+            <p>Razonar, decidir, resolver, crear</p>
+          </div>
+        </div>
+        <div class="dos-columnas" style="margin-bottom:22px;">
+          <div class="tarjeta dorada" style="text-align:center; border-left:none; border-top:5px solid var(--dorado);">
+            <h3 style="font-size:32px;">Comunicar</h3>
+            <p>Lenguaje, significado, cultura</p>
+          </div>
+          <div class="tarjeta" style="text-align:center; border-left:none; border-top:5px solid var(--azul-oscuro);">
+            <h3 style="font-size:32px;">Adaptarse</h3>
+            <p>Inteligencia, contexto, aprendizaje</p>
+          </div>
+        </div>
+        <div class="destacado" style="font-size:28px;">
+          Contexto: cuerpo, cultura, interacción y ambiente
+        </div>
+        <p style="margin-top:26px; text-align:center; font-size:22px; color:var(--azul-medio);">
+          <strong>Pensamiento y Lenguaje</strong> como puente entre la psicología cognitiva básica y cursos posteriores de investigación, desarrollo, cognición social, neuropsicología, educación y evaluación psicológica.
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============================================================
+       CONTROLES DE NAVEGACIÓN
+       ============================================================ -->
+  <button class="btn-nav btn-prev" id="btnPrev" disabled>← Anterior</button>
+  <button class="btn-nav btn-next" id="btnNext">Siguiente →</button>
+  <div class="progreso"><div class="barra" id="barraProgreso"></div></div>
+  <div class="contador" id="contador">1 / 15</div>
+
+  <!-- ============================================================
+       JAVASCRIPT
+       ============================================================ -->
+  <script>
+    // ==========================================================
+    // NAVEGACIÓN ENTRE DIAPOSITIVAS
+    // ==========================================================
+    const slides = document.querySelectorAll('.diapositiva');
+    const totalSlides = slides.length;
+    let slideActual = 0;
+
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const barraProgreso = document.getElementById('barraProgreso');
+    const contador = document.getElementById('contador');
+    const navLateral = document.getElementById('navLateral');
+    const btnMenu = document.getElementById('btnMenu');
+    const enlacesNav = navLateral.querySelectorAll('a');
+
+    function irASlide(n) {
+      if (n < 0 || n >= totalSlides) return;
+      slides[slideActual].classList.remove('activa');
+      slideActual = n;
+      slides[slideActual].classList.add('activa');
+      // Resetear scroll de la nueva diapositiva
+      slides[slideActual].scrollTop = 0;
+      actualizarUI();
+      if (window.innerWidth < 900) navLateral.classList.remove('abierto');
+    }
+
+    function actualizarUI() {
+      btnPrev.disabled = slideActual === 0;
+      btnNext.disabled = slideActual === totalSlides - 1;
+      const pct = ((slideActual + 1) / totalSlides) * 100;
+      barraProgreso.style.width = pct + '%';
+      contador.textContent = `${slideActual + 1} / ${totalSlides}`;
+      enlacesNav.forEach((a, i) => {
+        a.classList.toggle('activo', i === slideActual);
+      });
+    }
+
+    btnPrev.addEventListener('click', () => irASlide(slideActual - 1));
+    btnNext.addEventListener('click', () => irASlide(slideActual + 1));
+
+    enlacesNav.forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const idx = parseInt(a.dataset.slide);
+        irASlide(idx);
+      });
+    });
+
+    btnMenu.addEventListener('click', () => {
+      navLateral.classList.toggle('abierto');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth < 900 &&
+          navLateral.classList.contains('abierto') &&
+          !navLateral.contains(e.target) &&
+          e.target !== btnMenu) {
+        navLateral.classList.remove('abierto');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        if (slideActual < totalSlides - 1) irASlide(slideActual + 1);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (slideActual > 0) irASlide(slideActual - 1);
+      } else if (e.key === 'Escape') {
+        navLateral.classList.remove('abierto');
+      }
+    });
+
+    actualizarUI();
+
+    // ==========================================================
+    // ACTIVIDAD 1: VERDADERO O FALSO
+    // ==========================================================
+    const preguntasVF = [
+      {
+        texto: "Pensar equivale simplemente a hablar internamente.",
+        correcta: false,
+        retro: "Falso. El pensamiento es la manipulación mental de información —palabras, imágenes, sonidos— para transformarla en nuevas representaciones. No se reduce a lenguaje interno."
+      },
+      {
+        texto: "Las imágenes mentales pueden ser visuales, auditivas y de otras modalidades sensoriales.",
+        correcta: true,
+        retro: "Verdadero. Las imágenes mentales no son exclusivamente visuales; involucran múltiples modalidades sensoriales."
+      },
+      {
+        texto: "La relación entre pensamiento y lenguaje es un problema cerrado y resuelto por la psicología.",
+        correcta: false,
+        retro: "Falso. Es un problema empírico y teórico abierto. Existen posiciones que van desde la dependencia total hasta la independencia, con hipótesis intermedias."
+      }
+    ];
+
+    const contenedorAct1 = document.getElementById('act1-preguntas');
+    preguntasVF.forEach((p, i) => {
+      const div = document.createElement('div');
+      div.style.marginBottom = '28px';
+      div.innerHTML = `
+        <p style="font-size:23px; font-weight:600; margin-bottom:14px; line-height:1.45;">${i+1}. ${p.texto}</p>
+        <div style="display:flex; gap:14px; flex-wrap:wrap;">
+          <button class="opcion" style="width:auto; min-width:160px;" data-resp="true" data-idx="${i}">Verdadero</button>
+          <button class="opcion" style="width:auto; min-width:160px;" data-resp="false" data-idx="${i}">Falso</button>
+        </div>
+        <div class="retro" id="retro-vf-${i}"></div>
+      `;
+      contenedorAct1.appendChild(div);
+    });
+
+    contenedorAct1.addEventListener('click', (e) => {
+      const btn = e.target.closest('.opcion');
+      if (!btn || btn.disabled) return;
+      const idx = parseInt(btn.dataset.idx);
+      const resp = btn.dataset.resp === 'true';
+      const p = preguntasVF[idx];
+      const retro = document.getElementById(`retro-vf-${idx}`);
+      const hermanos = btn.parentElement.querySelectorAll('.opcion');
+      hermanos.forEach(b => {
+        b.disabled = true;
+        if (b.dataset.resp === String(p.correcta)) b.classList.add('correcta');
+      });
+      if (resp !== p.correcta) btn.classList.add('incorrecta');
+      retro.textContent = p.retro;
+      retro.className = `retro visible ${resp === p.correcta ? 'ok' : 'no'}`;
+    });
+
+    // ==========================================================
+    // ACTIVIDAD 2: ARRASTRAR Y SOLTAR
+    // ==========================================================
+    const itemsArrastrar = [
+      { texto: "María cree que todos los miembros de cierto grupo son iguales y actúa en consecuencia.", cat: "sesgo" },
+      { texto: "Juan revisa si entendió bien el problema antes de elegir una estrategia.", cat: "metacognicion" },
+      { texto: "Ana divide un problema complejo en pasos más pequeños para resolverlo.", cat: "solucion" },
+      { texto: "Pedro solo busca información que confirme lo que ya cree.", cat: "sesgo" },
+      { texto: "Lucía se da cuenta de que su estrategia no funciona y la cambia.", cat: "metacognicion" }
+    ];
+
+    const contenedorItems = document.getElementById('itemsArrastrar');
+    const zonas = document.querySelectorAll('.categoria');
+    const retroArrastrar = document.getElementById('retroArrastrar');
+    let aciertosArrastrar = 0;
+
+    const itemsMezclados = [...itemsArrastrar].sort(() => Math.random() - 0.5);
+
+    itemsMezclados.forEach((item, i) => {
+      const div = document.createElement('div');
+      div.className = 'item-arrastrable';
+      div.draggable = true;
+      div.textContent = item.texto;
+      div.dataset.cat = item.cat;
+      div.id = `item-${i}`;
+      contenedorItems.appendChild(div);
+    });
+
+    document.querySelectorAll('.item-arrastrable').forEach(item => {
+      item.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', item.id);
+        item.style.opacity = '0.5';
+      });
+      item.addEventListener('dragend', () => {
+        item.style.opacity = '1';
+      });
+    });
+
+    zonas.forEach(zona => {
+      zona.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zona.classList.add('sobre');
+      });
+      zona.addEventListener('dragleave', () => {
+        zona.classList.remove('sobre');
+      });
+      zona.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zona.classList.remove('sobre');
+        const id = e.dataTransfer.getData('text/plain');
+        const item = document.getElementById(id);
+        if (!item) return;
+        const catCorrecta = item.dataset.cat;
+        const catZona = zona.dataset.cat;
+        zona.appendChild(item);
+        item.draggable = false;
+        item.style.cursor = 'default';
+        if (catCorrecta === catZona) {
+          item.style.background = '#2E7D32';
+          aciertosArrastrar++;
+        } else {
+          item.style.background = '#C62828';
+        }
+        if (document.querySelectorAll('.categoria .item-arrastrable').length === itemsArrastrar.length) {
+          retroArrastrar.textContent = aciertosArrastrar === itemsArrastrar.length
+            ? `¡Excelente! Clasificaste correctamente los ${itemsArrastrar.length} ejemplos.`
+            : `Acertaste ${aciertosArrastrar} de ${itemsArrastrar.length}. Revisa los que quedaron en rojo.`;
+          retroArrastrar.className = `retro visible ${aciertosArrastrar === itemsArrastrar.length ? 'ok' : 'no'}`;
+        }
+      });
+    });
+
+    // ==========================================================
+    // ACTIVIDAD 3: CUESTIONARIO DE OPCIÓN MÚLTIPLE
+    // ==========================================================
+    const preguntasMC = [
+      {
+        pregunta: "¿Qué sostiene la versión fuerte de la hipótesis Sapir-Whorf?",
+        opciones: [
+          "Que el lenguaje y el pensamiento son completamente independientes.",
+          "Que determinadas formas de pensamiento son imposibles sin un lenguaje específico.",
+          "Que todas las lenguas tienen exactamente la misma estructura cognitiva.",
+          "Que el bilingüismo elimina la influencia cultural."
+        ],
+        correcta: 1,
+        retro: "Correcto. La versión fuerte del relativismo lingüístico sostiene que ciertos pensamientos son imposibles sin un lenguaje determinado. Las versiones contemporáneas son más moderadas."
+      },
+      {
+        pregunta: "Según el material del curso, la competencia bilingüe...",
+        opciones: [
+          "Es una propiedad simple y dicotómica: se es bilingüe o no.",
+          "Depende únicamente de la edad de adquisición.",
+          "Puede variar entre comprensión, producción oral, lectura y escritura, y depende de la edad y el contexto.",
+          "No tiene relación con procesos cognitivos como la memoria o la atención."
+        ],
+        correcta: 2,
+        retro: "Exacto. La competencia bilingüe no es dicotómica; varía según la habilidad (comprensión, producción, lectura, escritura), la edad de adquisición y el contexto de uso."
+      },
+      {
+        pregunta: "¿Cuál de las siguientes afirmaciones sobre la inteligencia es correcta según el curso?",
+        opciones: [
+          "Inteligencia y conocimiento son sinónimos.",
+          "La inteligencia es una capacidad homogénea y única.",
+          "La inteligencia fluida se relaciona con el procesamiento en situaciones nuevas.",
+          "La medición de la inteligencia no tiene implicaciones éticas."
+        ],
+        correcta: 2,
+        retro: "Correcto. La inteligencia fluida involucra velocidad de procesamiento, memoria de trabajo y razonamiento visuoespacial en situaciones nuevas. La inteligencia no es homogénea ni equivalente al conocimiento."
+      },
+      {
+        pregunta: "¿Qué implica la metacognición?",
+        opciones: [
+          "Memorizar listas de conceptos sin reflexionar.",
+          "Pensar sobre cómo estamos pensando: monitorear, regular y evaluar nuestros procesos cognitivos.",
+          "Resolver problemas sin estrategia.",
+          "Evitar todos los sesgos cognitivos."
+        ],
+        correcta: 1,
+        retro: "Así es. La metacognición es la dimensión reflexiva del pensamiento: conocimiento, monitoreo, regulación y evaluación de nuestros propios procesos cognitivos."
+      }
+    ];
+
+    const contenedorAct3 = document.getElementById('act3');
+    preguntasMC.forEach((p, i) => {
+      const div = document.createElement('div');
+      div.style.marginBottom = '32px';
+      let opcionesHTML = '';
+      p.opciones.forEach((op, j) => {
+        opcionesHTML += `<button class="opcion" data-idx="${i}" data-op="${j}">${op}</button>`;
+      });
+      div.innerHTML = `
+        <p style="font-size:23px; font-weight:600; margin-bottom:14px; line-height:1.45;">${i+1}. ${p.pregunta}</p>
+        ${opcionesHTML}
+        <div class="retro" id="retro-mc-${i}"></div>
+      `;
+      contenedorAct3.appendChild(div);
+    });
+
+    contenedorAct3.addEventListener('click', (e) => {
+      const btn = e.target.closest('.opcion');
+      if (!btn || btn.disabled) return;
+      const idx = parseInt(btn.dataset.idx);
+      const op = parseInt(btn.dataset.op);
+      const p = preguntasMC[idx];
+      const retro = document.getElementById(`retro-mc-${idx}`);
+      const hermanos = btn.parentElement.querySelectorAll('.opcion');
+      hermanos.forEach(b => {
+        b.disabled = true;
+        if (parseInt(b.dataset.op) === p.correcta) b.classList.add('correcta');
+      });
+      if (op !== p.correcta) btn.classList.add('incorrecta');
+      retro.textContent = p.retro;
+      retro.className = `retro visible ${op === p.correcta ? 'ok' : 'no'}`;
+    });
+
+    // ==========================================================
+    // ACTIVIDAD 4: TARJETAS DE MEMORIA
+    // ==========================================================
+    const parejasMemoria = [
+      { concepto: "Inteligencia fluida", definicion: "Procesamiento en situaciones nuevas, velocidad y memoria de trabajo." },
+      { concepto: "Inteligencia cristalizada", definicion: "Uso de conocimientos adquiridos: vocabulario, información general." },
+      { concepto: "Metacognición", definicion: "Pensar sobre cómo pensamos: monitoreo y regulación." },
+      { concepto: "Teoría de la mente", definicion: "Representar estados mentales propios y ajenos." },
+      { concepto: "Sesgo de confirmación", definicion: "Buscar solo información que confirme nuestras creencias." },
+      { concepto: "Bilingüismo", definicion: "Competencia variable en dos lenguas según habilidad y contexto." },
+      { concepto: "Prototipo", definicion: "Ejemplar más representativo de una categoría." },
+      { concepto: "Sapir-Whorf", definicion: "El lenguaje influye en cómo pensamos (versiones fuerte y débil)." }
+    ];
+
+    const gridMemoria = document.getElementById('gridMemoria');
+    let tarjetas = [];
+    parejasMemoria.forEach((p, i) => {
+      tarjetas.push({ tipo: 'concepto', texto: p.concepto, par: i });
+      tarjetas.push({ tipo: 'definicion', texto: p.definicion, par: i });
+    });
+    tarjetas.sort(() => Math.random() - 0.5);
+
+    tarjetas.forEach((t) => {
+      const div = document.createElement('div');
+      div.className = 'tarjeta-memoria';
+      div.dataset.par = t.par;
+      div.dataset.tipo = t.tipo;
+      div.innerHTML = `
+        <div class="interior">
+          <div class="cara frente">${t.tipo === 'concepto' ? t.texto : 'Definición'}</div>
+          <div class="cara reverso">${t.texto}</div>
+        </div>
+      `;
+      div.addEventListener('click', () => {
+        div.classList.toggle('volteada');
+      });
+      gridMemoria.appendChild(div);
+    });
+
+    // ==========================================================
+    // SIMULACIÓN: LABORATORIO DE CATEGORIZACIÓN
+    // ==========================================================
+    const forma = document.getElementById('forma');
+    const color = document.getElementById('color');
+    const tamano = document.getElementById('tamano');
+    const contexto = document.getElementById('contexto');
+    const valForma = document.getElementById('valForma');
+    const valColor = document.getElementById('valColor');
+    const valTamano = document.getElementById('valTamano');
+    const valContexto = document.getElementById('valContexto');
+    const btnSesgo = document.getElementById('btnSesgo');
+    const btnReset = document.getElementById('btnReset');
+    const feedbackSim = document.getElementById('feedbackSim');
+
+    let sesgoActivo = false;
+    let chart = null;
+
+    const prototipo = { forma: 7, color: 3, tamano: 5, contexto: 6 };
+
+    function calcularCategorias() {
+      const f = parseInt(forma.value);
+      const c = parseInt(color.value);
+      const t = parseInt(tamano.value);
+      const ctx = parseInt(contexto.value);
+
+      const dist = Math.sqrt(
+        Math.pow(f - prototipo.forma, 2) +
+        Math.pow(c - prototipo.color, 2) +
+        Math.pow(t - prototipo.tamano, 2) +
+        Math.pow(ctx - prototipo.contexto, 2)
+      );
+      const maxDist = Math.sqrt(4 * 100);
+      const distNorm = dist / maxDist;
+
+      let probPrototipico = Math.max(0, 1 - distNorm * 1.5);
+      let probPeriferico = Math.max(0, 1 - Math.abs(distNorm - 0.4) * 3);
+      let probAmbiguo = Math.max(0, distNorm * 1.2);
+
+      if (sesgoActivo) {
+        probPrototipico = Math.min(1, probPrototipico * 1.8);
+        probAmbiguo = Math.max(0, probAmbiguo * 0.5);
+      }
+
+      const suma = probPrototipico + probPeriferico + probAmbiguo;
+      if (suma > 0) {
+        probPrototipico = probPrototipico / suma;
+        probPeriferico = probPeriferico / suma;
+        probAmbiguo = probAmbiguo / suma;
+      }
+
+      return { probPrototipico, probPeriferico, probAmbiguo, distNorm };
+    }
+
+    function actualizarSimulacion() {
+      valForma.textContent = forma.value;
+      valColor.textContent = color.value;
+      valTamano.textContent = tamano.value;
+      valContexto.textContent = contexto.value;
+
+      const { probPrototipico, probPeriferico, probAmbiguo, distNorm } = calcularCategorias();
+
+      if (chart) {
+        chart.data.datasets[0].data = [
+          probPrototipico * 100,
+          probPeriferico * 100,
+          probAmbiguo * 100
+        ];
+        chart.update('none');
+      } else {
+        const ctx = document.getElementById('graficoCategorias').getContext('2d');
+        chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Prototípico', 'Periférico', 'Ambiguo'],
+            datasets: [{
+              label: 'Probabilidad (%)',
+              data: [
+                probPrototipico * 100,
+                probPeriferico * 100,
+                probAmbiguo * 100
+              ],
+              backgroundColor: ['#13538A', '#E7C873', '#C62828'],
+              borderRadius: 8,
+              borderSkipped: false
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => `${ctx.parsed.y.toFixed(1)}%`
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { font: { size: 14 } },
+                grid: { color: 'rgba(0,0,0,0.05)' }
+              },
+              x: {
+                ticks: { font: { size: 15, weight: '600' } },
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      }
+
+      let fb = '';
+      if (distNorm < 0.2) {
+        fb = 'El estímulo es muy cercano al prototipo. El agente cognitivo lo categoriza como altamente prototípico.';
+      } else if (distNorm < 0.45) {
+        fb = 'El estímulo es relativamente cercano al prototipo, pero con rasgos periféricos. La categorización es menos segura.';
+      } else {
+        fb = 'El estímulo se aleja del prototipo. El agente cognitivo lo considera ambiguo o periférico.';
+      }
+
+      if (sesgoActivo) {
+        fb += ' El sesgo de confirmación está activo: el agente favorece la categoría prototípica, reduciendo la ambigüedad.';
+      }
+
+      if (distNorm < 0.3 && !sesgoActivo) {
+        fb += ' Prueba a alejar los controles del prototipo (forma=7, color=3, tamaño=5, contexto=6) para ver cómo cambia la categorización.';
+      }
+
+      feedbackSim.textContent = fb;
+    }
+
+    [forma, color, tamano, contexto].forEach(input => {
+      input.addEventListener('input', actualizarSimulacion);
+    });
+
+    btnSesgo.addEventListener('click', () => {
+      sesgoActivo = !sesgoActivo;
+      btnSesgo.textContent = sesgoActivo ? 'Desactivar sesgo de confirmación' : 'Activar sesgo de confirmación';
+      btnSesgo.classList.toggle('activo', sesgoActivo);
+      actualizarSimulacion();
+    });
+
+    btnReset.addEventListener('click', () => {
+      forma.value = 5;
+      color.value = 5;
+      tamano.value = 5;
+      contexto.value = 5;
+      sesgoActivo = false;
+      btnSesgo.textContent = 'Activar sesgo de confirmación';
+      btnSesgo.classList.remove('activo');
+      actualizarSimulacion();
+    });
+
+    actualizarSimulacion();
+  </script>
+</body>
+</html>
